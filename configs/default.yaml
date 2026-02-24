@@ -1,0 +1,78 @@
+# ============================================================
+#  Default Configuration – IO/NIO Binary Classifier
+# ============================================================
+
+# --- Model ---
+backbone: resnet18          # resnet18 | resnet50
+pretrained: true
+freeze_backbone: false    # Full Fine-Tuning
+# freeze_backbone: true   # Nur Kopf trainieren
+# freeze_backbone: layer4 # Letzter Conv-Block + Kopf (empfohlen fuer kleine Datasets)
+
+# --- Loss & Klassengewichtung ---
+use_class_weights: true     # Gewichte automatisch aus Trainingsset berechnen
+use_weighted_sampler: false # WeightedRandomSampler im DataLoader (alternativ)
+
+# --- Training ---
+seed: 123
+epochs: 50
+batch_size: 16
+image_size: 224
+num_workers: 0              # 0 = Hauptprozess (sicher auf Windows/CPU)
+dummy_image_size: 320       # Groessere Dummy-Bilder fuer realistischere Tests
+dummy_n_per_split: 128
+dummy_difficulty: medium      # easy | medium | hard
+dummy_label_noise: 0.0      # Keine absichtliche Fehlzuordnung
+
+# --- Optimizer ---
+optimizer: adamw          # adam | adamw | sgd
+learning_rate: 0.0001
+weight_decay: 0.0001
+momentum: 0.9               # nur für SGD
+
+# --- Scheduler ---
+scheduler: cosine           # cosine | step | plateau | none
+scheduler_step_size: 10     # für StepLR
+scheduler_gamma: 0.1        # für StepLR
+scheduler_patience: 5       # für ReduceLROnPlateau
+
+# --- Early Stopping ---
+early_stopping: true
+early_stopping_monitor: val_acc  # val_loss | val_acc
+early_stopping_patience: 10   #wie lange ohne Verbesserung warten
+early_stopping_delta: 0.001   # minimale Verbesserung für "besser"
+
+# --- Augmentation (nur Training) ---
+augmentation:
+  random_horizontal_flip: true
+  random_vertical_flip: true
+  random_rotation: 25
+  color_jitter:
+    brightness: 0.3
+    contrast: 0.3
+    saturation: 0.3
+    hue: 0.05
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std:  [0.229, 0.224, 0.225]
+
+# --- Daten ---
+data_dir: data
+csv_index: null             # Pfad zu CSV-Index, oder null für Ordnerstruktur
+
+# --- Logging ---
+log_tensorboard: true
+log_csv: true
+
+# --- XAI ---
+xai:
+  enabled: true
+  method: [integrated_gradients, saliency]  # integrated_gradients | saliency | occlusion | all
+  n_samples: 10             # Anzahl Val-Bilder für IG-Attribution
+  overlay: true             # Original + Heatmap nebeneinander
+  ig_steps: 50              # nur für integrated_gradients
+  occ_patch_size: 64        # nur für occlusion
+
+# --- Run-Name ---
+run_name: null              # null = auto (Timestamp + Hyperparameter)
+
