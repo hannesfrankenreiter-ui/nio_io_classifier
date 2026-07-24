@@ -44,44 +44,81 @@ def _denorm_to_pil(tensor: torch.Tensor, mean: torch.Tensor, std: torch.Tensor):
     return TF.to_pil_image(t)
 
 
-def integrated_gradients(
+def integrated_gradients_signed(
     model,
     input_tensor: torch.Tensor,
     target_class: int,
     steps: int = 50,
-) -> np.ndarray:
+    step_batch: int = 8,
+) -> torch.Tensor:
     """
-    Compute Integrated Gradients attribution for one image.
+    Signed Integrated Gradients attribution (right Riemann sum, Formel 4-1):
+
+        IG_i = (x_i - x'_i) * (1/m) * sum_{k=1..m} dF(x' + (k/m)(x - x')) / dx_i
+
+    Erfüllt das Completeness-Axiom: sum(IG) ~ F(x) - F(x')
+    (Sundararajan et al. 2017, Diskretisierungsfehler O(1/m)).
+
+    Die m Stützpunkte werden in Mini-Batches à `step_batch` verarbeitet und die
+    Gradienten aufsummiert. Ergebnis ist mathematisch identisch zum Verarbeiten
+    aller Steps auf einmal (Summe/m = Mittelwert), aber der Spitzen-VRAM bleibt
+    beschränkt: ein einzelner (m, C, H, W)-Backward bei 512px/ResNet-50 sprengt
+    die 16 GB und wird vom Windows-Treiber ins System-RAM ausgelagert (~50x
+    langsamer). Chunking hält alles auf der GPU.
 
     Args:
         model        : nn.Module (eval mode)
         input_tensor : (1, C, H, W) normalized image
         target_class : target class index
-        steps        : number of Riemann approximation steps
+        steps        : number of Riemann approximation steps (m)
+        step_batch   : Anzahl gleichzeitig verarbeiteter Stützpunkte (VRAM-Puffer)
+
+    Returns:
+        attribution  : (H, W) torch.Tensor, signiert (über Kanäle summiert)
+    """
+    model.eval()
+    baseline = torch.zeros_like(input_tensor)                                      # Nulltensor als Baseline
+
+    alphas = (
+        torch.arange(1, steps + 1, device=input_tensor.device, dtype=input_tensor.dtype)
+        / steps
+    ).view(-1, 1, 1, 1)                                                             # a_k = k/m, k = 1..m
+
+    grad_sum = torch.zeros_like(input_tensor)                                       # (1, C, H, W), akkumulierte Gradienten
+    for start in range(0, steps, max(1, step_batch)):                              # Stützpunkte in Blöcken abarbeiten
+        a = alphas[start : start + step_batch]                                      # (b, 1, 1, 1)
+        interp = (baseline + a * (input_tensor - baseline)).requires_grad_(True)    # (b, C, H, W)
+
+        model.zero_grad(set_to_none=True)
+        logits = model(interp)
+        score = logits[:, target_class].sum()                                       # sum: unskalierter Gradient je Stützpunkt
+        score.backward()                                                            # Gradienten berechnen
+        grad_sum += interp.grad.detach().sum(dim=0, keepdim=True)                    # Blockgradienten aufsummieren
+
+    avg_grads = (grad_sum / steps).squeeze(0)                                       # (1/m) * Summe der Gradienten (Formel 4-1)
+    delta = (input_tensor - baseline).squeeze(0)                                    # Differenz zwischen Eingabe und Baseline
+    return (delta * avg_grads).sum(dim=0)                                           # signiert, kanalweise summiert -> (H, W)
+
+
+def integrated_gradients(
+    model,
+    input_tensor: torch.Tensor,
+    target_class: int,
+    steps: int = 50,
+    step_batch: int = 8,
+) -> np.ndarray:
+    """
+    Integrated-Gradients-Heatmap für die Visualisierung.
+
+    Betrag der signierten Attribution, normiert auf [0, 1].
 
     Returns:
         attribution  : (H, W) numpy array normalized to [0, 1]
     """
-    model.eval()
-    baseline = torch.zeros_like(input_tensor)                                      # Schwarzbild
-
-    alphas = torch.linspace(
-        0.0, 1.0, steps, device=input_tensor.device, dtype=input_tensor.dtype
-    ).view(-1, 1, 1, 1)                                                             # K/m
-    interp = baseline + alphas * (input_tensor - baseline)                          # Pfad in m Schritten
-    interp = interp.requires_grad_(True)
-
-    model.zero_grad(set_to_none=True)
-    logits = model(interp)
-    score = logits[:, target_class].sum()                                           # Summe über Pfad (Trapezregel)
-    score.backward()                                                                # Gradienten berechnen
-
-    grads = interp.grad.detach()                                                    # (steps, C, H, W)
-    avg_grads = (grads[:-1] + grads[1:]).mean(dim=0)                                # Mittelwert über Pfad (Trapezregel)
-    delta = (input_tensor - baseline).squeeze(0)                                    # Differenz zwischen Eingabe und Basislinie
-    attribution = (delta * avg_grads).abs().sum(dim=0)                              # Kanalweise Multiplikation + aufsummieren -> (H, W)
-
-    return _normalize(attribution.detach().cpu().numpy())
+    attribution = integrated_gradients_signed(
+        model, input_tensor, target_class, steps, step_batch
+    )
+    return _normalize(attribution.abs().detach().cpu().numpy())
 
 
 def saliency_map(
@@ -220,15 +257,22 @@ def visualize_all_methods(
     plt.close()
 
 
-def run_xai(model, val_loader, config: dict, run_dir: str, logger=None):
+def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str = None):
     """
-    Create XAI heatmaps for first n_samples validation images.
-    Method is configurable: integrated_gradients | saliency | occlusion | all
+    Erzeugt XAI-Heatmaps für die Bilder in `loader`.
+    n_samples begrenzt die Anzahl; "all" oder null = ALLE Bilder im Loader.
+    Method ist konfigurierbar: integrated_gradients | saliency | occlusion | all
+    out_dir: Zielordner; None = <run_dir>/xai/integrated_gradients (Standard).
+             Dient dazu, z.B. val- und test-Heatmaps getrennt abzulegen.
     """
     xai_cfg = config.get("xai", {})
     n_samples = xai_cfg.get("n_samples", 10)
+    # "all" / null -> keine Begrenzung (alle Bilder im Loader)
+    if n_samples is None or (isinstance(n_samples, str) and n_samples.lower() == "all"):
+        n_samples = float("inf")
     overlay = xai_cfg.get("overlay", True)
     steps = xai_cfg.get("ig_steps", 50)
+    step_batch = xai_cfg.get("ig_step_batch", 8)   # VRAM-Puffer: Stützpunkte pro Backward
     patch_size = xai_cfg.get("occ_patch_size", 32)
     raw_methods = xai_cfg.get("methods", xai_cfg.get("method", "integrated_gradients"))
     if isinstance(raw_methods, str):
@@ -250,7 +294,7 @@ def run_xai(model, val_loader, config: dict, run_dir: str, logger=None):
         )
     methods = list(dict.fromkeys(methods))
 
-    xai_dir = os.path.join(run_dir, "xai", "integrated_gradients")
+    xai_dir = out_dir if out_dir else os.path.join(run_dir, "xai", "integrated_gradients")
     os.makedirs(xai_dir, exist_ok=True)
 
     norm = config.get("augmentation", {}).get("normalize", {})
@@ -258,14 +302,15 @@ def run_xai(model, val_loader, config: dict, run_dir: str, logger=None):
     std = torch.tensor(norm.get("std", [0.229, 0.224, 0.225])).view(3, 1, 1)
 
     model.eval()
+    device = next(model.parameters()).device  # Modell kann auf GPU liegen -> Eingaben mitziehen
     count = 0
 
-    for images, labels in val_loader:
+    for images, labels in loader:
         for i in range(images.size(0)):
             if count >= n_samples:
                 return
 
-            inp = images[i].unsqueeze(0)
+            inp = images[i].unsqueeze(0).to(device)
             label = labels[i].item()
 
             with torch.no_grad():
@@ -279,7 +324,7 @@ def run_xai(model, val_loader, config: dict, run_dir: str, logger=None):
                 attrs = {}
                 if "integrated_gradients" in methods:
                     attrs["Integrated Gradients"] = integrated_gradients(
-                        model, inp.clone(), pred, steps
+                        model, inp.clone(), pred, steps, step_batch
                     )
                 if "saliency" in methods:
                     attrs["Saliency Map"] = saliency_map(model, inp.clone(), pred)
@@ -318,7 +363,7 @@ def run_xai(model, val_loader, config: dict, run_dir: str, logger=None):
                         img_pil, attr, save_path, f"Occlusion Map\n{title}", overlay
                     )
                 else:
-                    attr = integrated_gradients(model, inp.clone(), pred, steps)
+                    attr = integrated_gradients(model, inp.clone(), pred, steps, step_batch)
                     visualize_attribution(
                         img_pil,
                         attr,

@@ -3,29 +3,33 @@
 # ============================================================
 
 # --- Model ---
-backbone: resnet18          # resnet18 | resnet50
+backbone: resnet50          # resnet18 | resnet50 | efficientnet_b0 | convnext_tiny
 pretrained: true
-freeze_backbone: false    # Full Fine-Tuning
-# freeze_backbone: true   # Nur Kopf trainieren
-# freeze_backbone: layer4 # Letzter Conv-Block + Kopf (empfohlen fuer kleine Datasets)
+freeze_backbone: layer4    # false = Full Fine-Tuning | true = Nur Kopf | "layer4" = Letzter Block + Kopf
 
 # --- Loss & Klassengewichtung ---
 use_class_weights: true     # Gewichte automatisch aus Trainingsset berechnen
 use_weighted_sampler: false # WeightedRandomSampler im DataLoader (alternativ)
+label_smoothing: 0.05       # Label Smoothing für bessere Kalibrierung (0.0 = deaktiviert)
 
 # --- Training ---
 seed: 123
+deterministic: false        # true = bit-exakt reproduzierbar (langsamer). false = cudnn.benchmark+TF32 an -> schneller, Laeufe geseedet aber nicht bit-identisch.
 epochs: 50
-batch_size: 16
-image_size: 224
-num_workers: 0              # 0 = Hauptprozess (sicher auf Windows/CPU)
-dummy_image_size: 320       # Groessere Dummy-Bilder fuer realistischere Tests
+batch_size: 16               # bei 1024px ~4x Speicher ggue. 512px -> kleinere Batch. Bei CUDA-OOM auf 4 senken.
+image_size: 512
+num_workers: 8              # >0 parallelisiert das Bildladen (auf dieser Maschine getestet, 20 Kerne). Bei Problemen auf 0 zurueck.
+dummy_image_size: 512       # Groessere Dummy-Bilder fuer realistischere Tests
 dummy_n_per_split: 128
-dummy_difficulty: medium      # easy | medium | hard
+dummy_difficulty: medium    # easy | medium | hard
 dummy_label_noise: 0.0      # Keine absichtliche Fehlzuordnung
 
+# --- Mixed Precision & Stabilisierung ---
+use_amp: true               # Mixed Precision Training (nur aktiv wenn CUDA verfuegbar)
+grad_clip_max_norm: 1.0     # Gradient Clipping (0.0 = deaktiviert)
+
 # --- Optimizer ---
-optimizer: adamw          # adam | adamw | sgd
+optimizer: adamw            # adam | adamw | sgd
 learning_rate: 0.0001
 weight_decay: 0.0001
 momentum: 0.9               # nur für SGD
@@ -36,11 +40,19 @@ scheduler_step_size: 10     # für StepLR
 scheduler_gamma: 0.1        # für StepLR
 scheduler_patience: 5       # für ReduceLROnPlateau
 
-# --- Early Stopping ---
+# --- Early Stopping & Checkpointing ---
+# Beide (Early Stopping + best.pt) nutzen dieselbe Metrik.
 early_stopping: true
-early_stopping_monitor: val_acc  # val_loss | val_acc
-early_stopping_patience: 10   #wie lange ohne Verbesserung warten
-early_stopping_delta: 0.001   # minimale Verbesserung für "besser"
+early_stopping_monitor: val_f1   # val_loss | val_acc | val_f1
+early_stopping_patience: 10      # Wie lange ohne Verbesserung warten
+early_stopping_delta: 0.001      # Minimale Verbesserung für "besser"
+
+# --- Inferenz ---
+threshold: 0.5              # Entscheidungsschwellenwert für NIO-Klasse (prob_nio >= threshold → NIO)
+
+# --- Test-Time Augmentation (TTA) ---
+tta_enabled: false          # TTA bei Inferenz aktivieren
+tta_n: 5                    # Anzahl augmentierter Ansichten (inkl. Original)
 
 # --- Augmentation (nur Training) ---
 augmentation:
@@ -52,27 +64,41 @@ augmentation:
     contrast: 0.3
     saturation: 0.3
     hue: 0.05
+  gaussian_blur:
+    enabled: true
+    kernel_size: 5
+    sigma: [0.1, 1.5]
+    p: 0.2
+  random_erasing:
+    enabled: true
+    p: 0.3
+    scale: [0.02, 0.15]
+    ratio: [0.3, 3.3]
   normalize:
     mean: [0.485, 0.456, 0.406]
     std:  [0.229, 0.224, 0.225]
 
 # --- Daten ---
-data_dir: data
+data_dir: data_512          # vorab auf 512px verkleinerte Bilder (scripts/prepare_resized_data.py --size 512). Original: data
 csv_index: null             # Pfad zu CSV-Index, oder null für Ordnerstruktur
 
 # --- Logging ---
 log_tensorboard: true
 log_csv: true
 
+# --- Export ---
+export_onnx: false          # ONNX-Modell nach Training exportieren
+
 # --- XAI ---
 xai:
   enabled: true
   method: [integrated_gradients, saliency]  # integrated_gradients | saliency | occlusion | all
-  n_samples: 10             # Anzahl Val-Bilder für IG-Attribution
+  split: test               # val | test — welches Set fuer die Heatmaps erklaert wird
+  n_samples: all            # Anzahl Bilder, oder "all" fuer ALLE Bilder im Split
   overlay: true             # Original + Heatmap nebeneinander
   ig_steps: 50              # nur für integrated_gradients
+  ig_step_batch: 8          # Stützpunkte pro Backward (VRAM-Puffer). Bei OOM/Auslagerung senken, mehr VRAM -> erhöhen
   occ_patch_size: 64        # nur für occlusion
 
 # --- Run-Name ---
 run_name: null              # null = auto (Timestamp + Hyperparameter)
-
