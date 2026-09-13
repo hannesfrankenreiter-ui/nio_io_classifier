@@ -6,6 +6,7 @@ __pycache__/
 dist/
 build/
 .eggs/
+.pytest_cache/
 
 # Virtual Environments
 venv/
@@ -18,15 +19,35 @@ data/train/
 data/val/
 data/test/
 
-# Outputs (Experimente nicht committen, nur Struktur)
-outputs/runs/
+# Vorab verkleinerte Daten (abgeleitet, per scripts/prepare_resized_data.py erzeugbar)
+data_512/
+data_*/
+
+# Weitere Datensaetze und Referenzbilder (Sperrvermerk – nie committen)
+dataStufe2*/
+korb_referenz/
+
+# Outputs: nur Ordnerstruktur, Configs, Metriken und Vergleichstabellen.
+# Modelle, Heatmaps, Pipeline- und Sichtungsbilder bleiben draussen (Sperrvermerk).
+outputs/**
+!outputs/**/
+!outputs/**/.gitkeep
+!outputs/runs/**/config.yaml
+!outputs/runs/**/metrics/*.json
+!outputs/runs/**/metrics/*.csv
+!outputs/runs/**/metrics/*.png
+!outputs/runs/**/preds/*.csv
+!outputs/runs/Stufe_*/*.md
+
+# Von xai_kennzahlen.py / thesis_kap5_abbildungen*.py erzeugte Abbildungen (enthalten Bauteilbilder)
+thesis/abbildungen/kap5/
 
 # Checkpoints
 *.pt
 *.pth
 
-# Tensorboard
-runs/
+# Tensorboard (Standardordner im Projektwurzelverzeichnis; nicht outputs/runs)
+/runs/
 
 # IDEs
 .vscode/

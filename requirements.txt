@@ -1,6 +1,7 @@
 torch>=2.0.0
 torchvision>=0.15.0
 Pillow>=9.0.0
+opencv-python>=4.7.0        # Korb-Zuschnitt und Rueckprojektion
 PyYAML>=6.0
 scikit-learn>=1.2.0
 matplotlib>=3.7.0

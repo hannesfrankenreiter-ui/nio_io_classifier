@@ -15,6 +15,13 @@ def get_logger(name: str, log_file: str = None) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
+    # Windows-Konsole (cp1252) kann Sonderzeichen wie ★ oder → nicht kodieren.
+    # UTF-8 erzwingen, damit das Logging nicht mit UnicodeEncodeError abbricht.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
+
     # Doppelte Handler verhindern (z.B. bei mehrfachem Aufruf in Tests)
     if logger.handlers:
         return logger

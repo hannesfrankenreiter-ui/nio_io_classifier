@@ -6,6 +6,10 @@
 backbone: resnet50          # resnet18 | resnet50 | efficientnet_b0 | convnext_tiny
 pretrained: true
 freeze_backbone: layer4    # false = Full Fine-Tuning | true = Nur Kopf | "layer4" = Letzter Block + Kopf
+freeze_bn_stats: true      # BatchNorm der EINGEFRORENEN Schichten auch im Training auf eval halten.
+                           # requires_grad=False friert nur weight/bias ein - running_mean/var sind
+                           # Buffer und drifteten sonst weiter, was die Val-Kurve stark schwanken laesst.
+                           # false = altes Verhalten (fuer Ablationsvergleich).
 
 # --- Loss & Klassengewichtung ---
 use_class_weights: true     # Gewichte automatisch aus Trainingsset berechnen
@@ -30,7 +34,10 @@ grad_clip_max_norm: 1.0     # Gradient Clipping (0.0 = deaktiviert)
 
 # --- Optimizer ---
 optimizer: adamw            # adam | adamw | sgd
-learning_rate: 0.0001
+learning_rate: 0.0001       # Klassifikationskopf
+backbone_learning_rate: 0.00001  # entfrorene Backbone-Schichten (z.B. layer4). null = wie learning_rate.
+                                 # Vortrainierte Conv-Schichten vertragen deutlich weniger als der
+                                 # frisch initialisierte Kopf - 1e-4 dort destabilisiert das Fine-Tuning.
 weight_decay: 0.0001
 momentum: 0.9               # nur für SGD
 
@@ -43,34 +50,58 @@ scheduler_patience: 5       # für ReduceLROnPlateau
 # --- Early Stopping & Checkpointing ---
 # Beide (Early Stopping + best.pt) nutzen dieselbe Metrik.
 early_stopping: true
-early_stopping_monitor: val_f1   # val_loss | val_acc | val_f1
-early_stopping_patience: 10      # Wie lange ohne Verbesserung warten
-early_stopping_delta: 0.001      # Minimale Verbesserung für "besser"
+early_stopping_monitor: val_loss # val_loss | val_acc | val_f1
+                                 # val_loss statt val_f1: f1 wird bei Schwelle 0.5 gemessen –
+                                 # also an einem Betriebspunkt, den die Schwellenbestimmung auf
+                                 # val danach ohnehin ersetzt. f1@0.5 ist ausserdem die deutlich
+                                 # verrauschtere Groesse; daran entstand der Ausreisser-Checkpoint.
+early_stopping_patience: 7       # Wie lange ohne Verbesserung warten
+early_stopping_delta: 0.001      # Minimale Verbesserung für "besser" (gilt auch fuer best.pt)
 
 # --- Inferenz ---
-threshold: 0.5              # Entscheidungsschwellenwert für NIO-Klasse (prob_nio >= threshold → NIO)
+threshold: 0.5              # Entscheidungsschwellenwert für NIO-Klasse (prob_nio >= threshold → NIO).
+                            # Gilt nur fuer predict.py. Das Training bestimmt seinen eigenen
+                            # Betriebspunkt auf VAL (F1-Maximum) und legt ihn in
+                            # metrics/threshold.json ab - von dort per --threshold uebernehmen.
 
 # --- Test-Time Augmentation (TTA) ---
 tta_enabled: false          # TTA bei Inferenz aktivieren
 tta_n: 5                    # Anzahl augmentierter Ansichten (inkl. Original)
 
 # --- Augmentation (nur Training) ---
+# Entschaerft gegenueber der ersten Fassung (VFlip an, Rotation 25, Jitter 0.3,
+# RandomErasing an): die Kombination verschob die Trainingsverteilung pro Epoche
+# so stark gegen das augmentierungsfreie Val-Set, dass die Val-Kurve sprang.
+# ACHTUNG color_jitter: build_transforms liest dort KEIN 'enabled'. Zum Abschalten
+# 'color_jitter: null' setzen - ein 'enabled: false' wuerde still ignoriert.
+# ACHTUNG random_horizontal_flip: einziger Schluessel, dessen Default beim
+# Weglassen 'true' ist. Zum Abschalten explizit 'false' schreiben.
 augmentation:
+  # Skalen-Augmentation fuer die Bauteil-Zuschnitte aus scripts/korb_referenz.py.
+  # Deren Seitenlaenge streut 307-2108 px, derselbe Defekt erscheint nach dem
+  # Skalieren auf image_size also unterschiedlich breit. scale ist ein FLAECHEN-
+  # anteil: [0.6, 1.0] entspricht linear 0.77-1.0. ratio bleibt 1:1, sonst kommt
+  # die Verzerrung zurueck, die der quadratische Zuschnitt gerade beseitigt hat.
+  # enabled: false -> wie bisher schlichtes T.Resize (fuer Ablationsvergleich).
+  random_resized_crop:
+    enabled: true
+    scale: [0.6, 1.0]
+    ratio: [1.0, 1.0]
   random_horizontal_flip: true
-  random_vertical_flip: true
-  random_rotation: 25
+  random_vertical_flip: false
+  random_rotation: 10
   color_jitter:
-    brightness: 0.3
-    contrast: 0.3
-    saturation: 0.3
-    hue: 0.05
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.10
+    hue: 0.02
   gaussian_blur:
     enabled: true
     kernel_size: 5
-    sigma: [0.1, 1.5]
-    p: 0.2
+    sigma: [0.1, 1.0]
+    p: 0.1
   random_erasing:
-    enabled: true
+    enabled: false
     p: 0.3
     scale: [0.02, 0.15]
     ratio: [0.3, 3.3]
@@ -79,7 +110,24 @@ augmentation:
     std:  [0.229, 0.224, 0.225]
 
 # --- Daten ---
-data_dir: data_512          # vorab auf 512px verkleinerte Bilder (scripts/prepare_resized_data.py --size 512). Original: data
+data_dir: data_stufe2_512   # quadratische Bauteil-Zuschnitte aus scripts/korb_referenz.py, auf 512 skaliert.
+                            # Erzeugt mit: korb_referenz.py anwenden data_stufe2 --quadratisch
+                            #              prepare_resized_data.py --source data_stufe2_freigestellt/zuschnitt --size 512
+                            # Vorher: data_512 (Vollbilder auf 512, ohne Zuschnitt) – als Vergleichsbasis erhalten.
+
+# --- Zuschnitt: wie ist data_dir aus den Originalaufnahmen entstanden? ---
+# Nur fuer die Rueckprojektion einer XAI-Heatmap ins Originalbild
+# (scripts/pipeline_original.py). Das Training liest data_dir unveraendert und
+# ignoriert diesen Block. Er wird gelesen statt geraten: eine Erkennung zur
+# Laufzeit muesste aus Ordnernamen schliessen und laege irgendwann still falsch.
+# Die Pipeline prueft die Angaben beim Start gegen die abgelegten Bilder.
+zuschnitt:
+  verfahren: bauteil          # bauteil | fest | ganz
+  original: data_stufe2       # Ordner mit den Originalaufnahmen (4096x3000)
+  referenzen: korb_referenz   # Korb-Referenzbilder (korb_referenz.py erstellen)
+  suchbereich: [350, 1200, 3100, 1800]   # x, y, breite, hoehe - der Korbboden
+  quadratisch: true
+  masken: data_stufe2_freigestellt/masken   # optional, fuer den Attributionsanteil
 csv_index: null             # Pfad zu CSV-Index, oder null für Ordnerstruktur
 
 # --- Logging ---
@@ -99,6 +147,15 @@ xai:
   ig_steps: 50              # nur für integrated_gradients
   ig_step_batch: 8          # Stützpunkte pro Backward (VRAM-Puffer). Bei OOM/Auslagerung senken, mehr VRAM -> erhöhen
   occ_patch_size: 64        # nur für occlusion
+  # Heatmap zurueck ins Originalbild (scripts/pipeline_original.py macht dasselbe
+  # nachtraeglich). Braucht den zuschnitt:-Block weiter oben. Je Aufnahme entsteht ein
+  # Ordner in xai/rueckprojektion/ mit vier Dateien: das Originalbild und die drei
+  # Methoden darauf - getrennt statt nebeneinander, damit jede die volle Breite hat.
+  rueckprojektion:
+    enabled: true
+    stil: lauf              # lauf = Farben wie die Heatmaps oben | thesis | demo
+    n_samples: 12           # Anzahl Aufnahmen, 0 = aus
+    breite: 2000            # Exportbreite je Bild in px
 
 # --- Run-Name ---
 run_name: null              # null = auto (Timestamp + Hyperparameter)

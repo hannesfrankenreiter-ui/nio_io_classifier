@@ -52,17 +52,18 @@ def integrated_gradients_signed(
     step_batch: int = 8,
 ) -> torch.Tensor:
     """
-    Signed Integrated Gradients attribution (right Riemann sum, Formel 4-1):
+    Signed Integrated Gradients attribution (right Riemann sum, Formel 5-2):
 
-        IG_i = (x_i - x'_i) * (1/m) * sum_{k=1..m} dF(x' + (k/m)(x - x')) / dx_i
+        IG_i = (x_i - x'_i) * (1/N_IG) * sum_{t_IG=1..N_IG}
+               dF(x' + (t_IG/N_IG)(x - x')) / dx_i
 
     Erfüllt das Completeness-Axiom: sum(IG) ~ F(x) - F(x')
-    (Sundararajan et al. 2017, Diskretisierungsfehler O(1/m)).
+    (Sundararajan et al. 2017, Diskretisierungsfehler O(1/N_IG)).
 
-    Die m Stützpunkte werden in Mini-Batches à `step_batch` verarbeitet und die
+    Die N_IG Stützpunkte werden in Mini-Batches à `step_batch` verarbeitet und die
     Gradienten aufsummiert. Ergebnis ist mathematisch identisch zum Verarbeiten
-    aller Steps auf einmal (Summe/m = Mittelwert), aber der Spitzen-VRAM bleibt
-    beschränkt: ein einzelner (m, C, H, W)-Backward bei 512px/ResNet-50 sprengt
+    aller Steps auf einmal (Summe/N_IG = Mittelwert), aber der Spitzen-VRAM bleibt
+    beschränkt: ein einzelner (N_IG, C, H, W)-Backward bei 512px/ResNet-50 sprengt
     die 16 GB und wird vom Windows-Treiber ins System-RAM ausgelagert (~50x
     langsamer). Chunking hält alles auf der GPU.
 
@@ -70,7 +71,7 @@ def integrated_gradients_signed(
         model        : nn.Module (eval mode)
         input_tensor : (1, C, H, W) normalized image
         target_class : target class index
-        steps        : number of Riemann approximation steps (m)
+        steps        : number of Riemann approximation steps (N_IG)
         step_batch   : Anzahl gleichzeitig verarbeiteter Stützpunkte (VRAM-Puffer)
 
     Returns:
@@ -82,7 +83,7 @@ def integrated_gradients_signed(
     alphas = (
         torch.arange(1, steps + 1, device=input_tensor.device, dtype=input_tensor.dtype)
         / steps
-    ).view(-1, 1, 1, 1)                                                             # a_k = k/m, k = 1..m
+    ).view(-1, 1, 1, 1)                                                             # a_IG = t_IG/N_IG, t_IG = 1..N_IG
 
     grad_sum = torch.zeros_like(input_tensor)                                       # (1, C, H, W), akkumulierte Gradienten
     for start in range(0, steps, max(1, step_batch)):                              # Stützpunkte in Blöcken abarbeiten
@@ -95,7 +96,7 @@ def integrated_gradients_signed(
         score.backward()                                                            # Gradienten berechnen
         grad_sum += interp.grad.detach().sum(dim=0, keepdim=True)                    # Blockgradienten aufsummieren
 
-    avg_grads = (grad_sum / steps).squeeze(0)                                       # (1/m) * Summe der Gradienten (Formel 4-1)
+    avg_grads = (grad_sum / steps).squeeze(0)                                       # (1/N_IG) * Summe der Gradienten (Formel 5-6)
     delta = (input_tensor - baseline).squeeze(0)                                    # Differenz zwischen Eingabe und Baseline
     return (delta * avg_grads).sum(dim=0)                                           # signiert, kanalweise summiert -> (H, W)
 
@@ -257,13 +258,28 @@ def visualize_all_methods(
     plt.close()
 
 
-def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str = None):
+def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str = None,
+            skip_existing: bool = False, names: list = None):
     """
     Erzeugt XAI-Heatmaps für die Bilder in `loader`.
     n_samples begrenzt die Anzahl; "all" oder null = ALLE Bilder im Loader.
     Method ist konfigurierbar: integrated_gradients | saliency | occlusion | all
     out_dir: Zielordner; None = <run_dir>/xai/integrated_gradients (Standard).
              Dient dazu, z.B. val- und test-Heatmaps getrennt abzulegen.
+    skip_existing: bereits vorhandene Dateien ueberspringen. Macht einen
+             abgebrochenen Lauf fortsetzbar – bei ~10 s pro Bild sonst teuer.
+             Der Zaehler laeuft trotzdem mit, die Nummerierung bleibt also
+             exakt an die (unshuffelte) Loader-Reihenfolge gekoppelt.
+    names:   optionale Dateinamen in Loader-Reihenfolge, len == len(dataset).
+             None = bisheriges Verhalten (img_0000.png, img_0001.png, …).
+
+             Gebraucht fuer die kuratierte Vergleichsauswahl: dort haengt die
+             Position eines Bildes von der Zahl der Fehlklassifikationen des
+             jeweiligen Laufs ab, dieselben Vergleichsbilder bekaemen also je
+             Lauf verschiedene Nummern und waeren nicht mehr vergleichbar.
+             Mit sprechenden Namen wird zugleich skip_existing namens- statt
+             positionsadressiert – die Wiederaufnahme bleibt damit korrekt,
+             wenn sich die Auswahl zwischen zwei Aufrufen geaendert hat.
     """
     xai_cfg = config.get("xai", {})
     n_samples = xai_cfg.get("n_samples", 10)
@@ -274,6 +290,13 @@ def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str
     steps = xai_cfg.get("ig_steps", 50)
     step_batch = xai_cfg.get("ig_step_batch", 8)   # VRAM-Puffer: Stützpunkte pro Backward
     patch_size = xai_cfg.get("occ_patch_size", 32)
+    # Hinweis zur Saliency Map: sie wird bewusst OHNE Perzentil-Kappung oder
+    # Glaettung dargestellt. Gemessen an S1_06/test i0306 liegt ihr Kontrast
+    # zwischen Bauteil und Hintergrund bei 1,02 - sie lokalisiert also nicht,
+    # waehrend Integrated Gradients dort 5,07 erreicht. Kappen (p99/p99,9)
+    # aendert das Verhaeltnis nicht, Gauss-Glaettung legt die hellsten Stellen
+    # sogar in den Hintergrund. Eine Darstellungskorrektur wuerde Struktur
+    # vortaeuschen, die die Karte nicht hat.
     raw_methods = xai_cfg.get("methods", xai_cfg.get("method", "integrated_gradients"))
     if isinstance(raw_methods, str):
         methods = [raw_methods.lower()]
@@ -297,6 +320,13 @@ def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str
     xai_dir = out_dir if out_dir else os.path.join(run_dir, "xai", "integrated_gradients")
     os.makedirs(xai_dir, exist_ok=True)
 
+    if names is not None and len(names) != len(loader.dataset):
+        raise ValueError(
+            f"names hat {len(names)} Eintraege, der Loader aber "
+            f"{len(loader.dataset)} Bilder. Die Namen muessen in "
+            "Loader-Reihenfolge stehen, sonst wandern Heatmaps unter falsche Namen."
+        )
+
     norm = config.get("augmentation", {}).get("normalize", {})
     mean = torch.tensor(norm.get("mean", [0.485, 0.456, 0.406])).view(3, 1, 1)
     std = torch.tensor(norm.get("std", [0.229, 0.224, 0.225])).view(3, 1, 1)
@@ -310,6 +340,12 @@ def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str
             if count >= n_samples:
                 return
 
+            name = names[count] if names is not None else f"img_{count:04d}.png"
+            save_path = os.path.join(xai_dir, name)
+            if skip_existing and os.path.exists(save_path):
+                count += 1
+                continue
+
             inp = images[i].unsqueeze(0).to(device)
             label = labels[i].item()
 
@@ -318,7 +354,6 @@ def run_xai(model, loader, config: dict, run_dir: str, logger=None, out_dir: str
 
             title = f"True: {CLASSES[label]}  |  Pred: {CLASSES[pred]}"
             img_pil = _denorm_to_pil(images[i], mean, std)
-            save_path = os.path.join(xai_dir, f"img_{count:04d}.png")
 
             if len(methods) > 1:
                 attrs = {}

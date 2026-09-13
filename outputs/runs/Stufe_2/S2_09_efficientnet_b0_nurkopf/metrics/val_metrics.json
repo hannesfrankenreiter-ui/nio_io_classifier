@@ -1,0 +1,22 @@
+{
+  "accuracy": 0.9949874686716792,
+  "precision": 0.995,
+  "recall": 0.995,
+  "f1": 0.995,
+  "n_samples": 399,
+  "n_io": 199,
+  "n_nio": 200,
+  "note": "pos_label=1 entspricht Klasse 'nio' (Fehlerklasse)",
+  "threshold": 0.4645448625087738,
+  "split": "val",
+  "inference_ms_per_image": 83.31976057435739,
+  "n_params_trainable": 657922,
+  "roc_auc": 0.9998994974874372,
+  "average_precision": 0.9999011083743843,
+  "metrics_at_0.5": {
+    "accuracy": 0.9924812030075187,
+    "precision": 0.9949748743718593,
+    "recall": 0.99,
+    "f1": 0.9924812030075187
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "threshold": 0.21618250012397766,
+  "criterion": "max_f1",
+  "determined_on": "val",
+  "val_f1_at_threshold": 0.9898989898989898,
+  "note": "Auf dem Validierungsset bestimmt und unveraendert auf das Testset angewendet. Fuer die Inferenz: predict.py --threshold <wert>."
+}

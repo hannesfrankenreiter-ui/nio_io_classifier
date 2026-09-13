@@ -30,6 +30,7 @@ def create_run_dir(config: dict, run_name: str = None) -> str:
         "metrics",
         "preds",
         os.path.join("xai", "integrated_gradients"),
+        os.path.join("xai", "rueckprojektion"),
     ]
     for sub in subdirs:
         os.makedirs(os.path.join(run_dir, sub), exist_ok=True)

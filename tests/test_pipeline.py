@@ -184,8 +184,9 @@ class TestEarlyStopping:
     def test_stops_after_patience(self):
         from src.training.early_stopping import EarlyStopping
 
+        # patience=3: 1 Initialisierungsschritt + 3 Schritte ohne Verbesserung = 4 Schritte
         es = EarlyStopping(patience=3, delta=0.01, mode="max")
-        for _ in range(3):
+        for _ in range(4):
             stopped = es.step(0.5)  # keine Verbesserung
         assert stopped
 
@@ -271,7 +272,10 @@ class TestEvaluator:
         trainer = Trainer(model, train_loader, val_loader, base_config, run_dir)
         trainer.train()
 
-        evaluator = Evaluator(model, test_loader, run_dir, torch.device("cpu"))
+        # Modell liegt nach dem Training auf trainer.device (cuda, falls verfügbar).
+        # Evaluator mit demselben Device betreiben, sonst Device-Mismatch auf GPU-Maschinen.
+        device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        evaluator = Evaluator(model, test_loader, run_dir, device)
         metrics   = evaluator.evaluate()
 
         for key in ["accuracy", "precision", "recall", "f1"]:

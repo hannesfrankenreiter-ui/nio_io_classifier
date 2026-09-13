@@ -1,0 +1,110 @@
+# ============================================================
+#  Versuchsstufe 2 – ResNet-18, vollstaendiges Fine-Tuning
+# ============================================================
+#  Von Hand angelegt (nicht von run_versuchsplan.py erzeugt).
+#  Der Dateiname enthaelt keine Laufnummer und kollidiert deshalb
+#  nicht mit den automatisch erzeugten S2_NN_*.yaml - dieser Lauf
+#  wird also nicht ueberschrieben.
+#
+#  Basis: configs/stufe_1/S1_06_resnet18_vollstaendig.yaml, Zeile fuer
+#  Zeile uebernommen. Geaendert sind AUSSCHLIESSLICH 'data_dir' und
+#  'image_size'. Nur so misst der Vergleich zu S1_06 den Datensatz und
+#  nicht nebenbei geaenderte Hyperparameter.
+#
+#  Daten: data_stufe2 (4096x3000, unangetastet)
+#           -> dataStufe2zugeschnitten        (Vereinigungs-Zuschnitt 2999x1200)
+#           -> dataStufe2zugeschnitten_800x320 (Netz-Eingabe, einmal resampelt)
+#  800x320 statt 512x512: gleiche Pixelzahl (256k vs 262k), also gleiche
+#  Rechenzeit und gleicher VRAM-Bedarf, aber unverzerrt und auf der
+#  schlechteren Achse 3,75x statt 5,9x verkleinert.
+# ============================================================
+backbone: resnet18
+pretrained: true
+freeze_backbone: false        # false = vollstaendiges Fine-Tuning
+freeze_bn_stats: true
+use_class_weights: true
+use_weighted_sampler: false
+label_smoothing: 0.05
+seed: 123
+deterministic: false
+epochs: 50
+batch_size: 16
+image_size: [320, 800]        # [Hoehe, Breite] - Reihenfolge wie bei T.Resize
+num_workers: 8
+dummy_image_size: 512
+dummy_n_per_split: 128
+dummy_difficulty: medium
+dummy_label_noise: 0.0
+use_amp: true
+grad_clip_max_norm: 1.0
+optimizer: adamw
+learning_rate: 0.0001
+backbone_learning_rate: 1.0e-05
+weight_decay: 0.0001
+momentum: 0.9
+scheduler: cosine
+scheduler_step_size: 10
+scheduler_gamma: 0.1
+scheduler_patience: 5
+early_stopping: true
+early_stopping_monitor: val_loss
+early_stopping_patience: 7
+early_stopping_delta: 0.001
+threshold: 0.5
+tta_enabled: false
+tta_n: 5
+augmentation:
+  random_horizontal_flip: true
+  random_vertical_flip: false
+  # Bewusst bei 10 belassen (wie S1_06). Gemessen an einem weissen Bild
+  # schwaerzt die Rotation beim breiten Format 5,9 % der Flaeche statt
+  # 3,9 % bei 512x512 - mehr, aber kein Grund, zwei Dinge gleichzeitig zu
+  # aendern. Fuer Gleichstand mit Stufe 1 waere 5 der passende Wert (3,1 %).
+  random_rotation: 10
+  color_jitter:
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.1
+    hue: 0.02
+  gaussian_blur:
+    enabled: true
+    kernel_size: 5
+    sigma:
+    - 0.1
+    - 1.0
+    p: 0.1
+  random_erasing:
+    enabled: false
+    p: 0.3
+    scale:
+    - 0.02
+    - 0.15
+    ratio:
+    - 0.3
+    - 3.3
+  normalize:
+    mean:
+    - 0.485
+    - 0.456
+    - 0.406
+    std:
+    - 0.229
+    - 0.224
+    - 0.225
+data_dir: dataStufe2zugeschnitten_800x320
+csv_index: null
+log_tensorboard: true
+log_csv: true
+export_onnx: false
+xai:
+  enabled: false              # wie in den Vergleichslaeufen aus; fuer Heatmaps auf true
+  method:
+  - integrated_gradients
+  - saliency
+  split: test
+  n_samples: all
+  overlay: true
+  ig_steps: 50
+  ig_step_batch: 8
+  occ_patch_size: 64
+run_name: null

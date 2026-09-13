@@ -1,0 +1,136 @@
+# ============================================================
+#  Kontrollversuch – nur der Klassifikationskopf wird trainiert
+# ============================================================
+# Zweck: Referenzkurve fuer die Ursachensuche an der schwankenden Val-Kurve.
+# Bei freeze_backbone: true ist das Backbone komplett eingefroren; zusammen mit
+# freeze_bn_stats: true bleiben auch alle BatchNorm-Statistiken konstant. Damit
+# lernt wirklich nur der neue Kopf. Ist diese Kurve deutlich glatter, lag ein
+# grosser Teil des Problems am Fine-Tuning bzw. an BatchNorm.
+#
+# Danach der Vergleichslauf mit configs/default.yaml
+# (freeze_backbone: layer4 + backbone_learning_rate: 0.00001).
+
+# --- Model ---
+backbone: resnet50
+pretrained: true
+freeze_backbone: true       # NUR der Kopf ist trainierbar
+freeze_bn_stats: true       # alle Backbone-BatchNorms bleiben auf eval
+
+# --- Loss & Klassengewichtung ---
+use_class_weights: true
+use_weighted_sampler: false
+label_smoothing: 0.05
+
+# --- Training ---
+seed: 123
+deterministic: true         # Kontrollversuch soll wiederholbar sein.
+                            # Schaltet cudnn.benchmark + TF32 ab -> spuerbar langsamer.
+epochs: 50
+batch_size: 16
+image_size: 512
+num_workers: 8
+dummy_image_size: 512
+dummy_n_per_split: 128
+dummy_difficulty: medium
+dummy_label_noise: 0.0
+
+# --- Mixed Precision & Stabilisierung ---
+use_amp: true
+grad_clip_max_norm: 1.0
+
+# --- Optimizer ---
+optimizer: adamw
+learning_rate: 0.0001            # Kopf
+backbone_learning_rate: null     # ohne Wirkung, Backbone ist eingefroren
+weight_decay: 0.0001
+momentum: 0.9
+
+# --- Scheduler ---
+scheduler: cosine
+scheduler_step_size: 10
+scheduler_gamma: 0.1
+scheduler_patience: 5
+
+# --- Early Stopping & Checkpointing ---
+early_stopping: true
+early_stopping_monitor: val_loss   # Loss reagiert feiner als F1 auf echte Verschlechterung
+early_stopping_patience: 7
+early_stopping_delta: 0.001
+
+# --- Inferenz ---
+threshold: 0.5
+
+# --- Test-Time Augmentation (TTA) ---
+tta_enabled: false
+tta_n: 5
+
+# --- Augmentation (entschaerft, identisch zu default.yaml) ---
+# ACHTUNG: color_jitter kennt kein 'enabled' - zum Abschalten 'color_jitter: null'.
+augmentation:
+  random_horizontal_flip: true
+  random_vertical_flip: false
+  random_rotation: 10
+  color_jitter:
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.10
+    hue: 0.02
+  gaussian_blur:
+    enabled: true
+    kernel_size: 5
+    sigma: [0.1, 1.0]
+    p: 0.1
+  random_erasing:
+    enabled: false
+    p: 0.3
+    scale: [0.02, 0.15]
+    ratio: [0.3, 3.3]
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std:  [0.229, 0.224, 0.225]
+
+# --- Daten ---
+data_dir: data_512
+
+# --- Zuschnitt: wie ist data_dir aus den Originalaufnahmen entstanden? ---
+# Nur fuer die Rueckprojektion einer XAI-Heatmap ins Originalbild
+# (scripts/pipeline_original.py). Das Training liest data_dir unveraendert und
+# ignoriert diesen Block. Er wird gelesen statt geraten: eine Erkennung zur
+# Laufzeit muesste aus Ordnernamen schliessen und laege irgendwann still falsch.
+# Die Pipeline prueft die Angaben beim Start gegen die abgelegten Bilder.
+zuschnitt:
+  verfahren: ganz             # bauteil | fest | ganz
+  original: data              # Ordner mit den Originalaufnahmen (4096x3000)
+csv_index: null
+
+# --- Logging ---
+log_tensorboard: true
+log_csv: true
+
+# --- Export ---
+export_onnx: false
+
+# --- XAI ---
+# Fuer den Kontrolllauf abgeschaltet: die Heatmaps kosten ~10 s pro Bild und
+# interessieren erst, wenn die Kurve stabil ist.
+xai:
+  enabled: false
+  method: [integrated_gradients, saliency]
+  split: val
+  n_samples: all
+  overlay: true
+  ig_steps: 50
+  ig_step_batch: 8
+  occ_patch_size: 64
+  # Heatmap zurueck ins Originalbild (scripts/pipeline_original.py macht dasselbe
+  # nachtraeglich). Braucht den zuschnitt:-Block weiter oben. Je Aufnahme entsteht ein
+  # Ordner in xai/rueckprojektion/ mit vier Dateien: das Originalbild und die drei
+  # Methoden darauf - getrennt statt nebeneinander, damit jede die volle Breite hat.
+  rueckprojektion:
+    enabled: true
+    stil: lauf              # lauf = Farben wie die Heatmaps oben | thesis | demo
+    n_samples: 12           # Anzahl Aufnahmen, 0 = aus
+    breite: 2000            # Exportbreite je Bild in px
+
+# --- Run-Name ---
+run_name: null

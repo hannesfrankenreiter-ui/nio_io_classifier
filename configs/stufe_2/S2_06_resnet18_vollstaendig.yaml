@@ -1,0 +1,122 @@
+# ============================================================
+#  Versuchsstufe 2 – Lauf 06 (Schritt 2)
+# ============================================================
+#  Backbone        : resnet18
+#  Freeze-Strategie: vollstaendiges Fine-Tuning
+#
+#  Automatisch erzeugt von scripts/run_versuchsplan.py aus
+#  configs/stufe_2_basis.yaml. Variiert sind ausschliesslich 'backbone'
+#  und 'freeze_backbone'; XAI ist fuer die Vergleichslaeufe aus,
+#  die Rueckprojektion (xai.rueckprojektion) bleibt an.
+#  NICHT von Hand editieren – wird beim naechsten Lauf ueberschrieben.
+# ============================================================
+backbone: resnet18
+pretrained: true
+freeze_backbone: false
+freeze_bn_stats: true
+use_class_weights: true
+use_weighted_sampler: false
+label_smoothing: 0.05
+seed: 123
+deterministic: false
+epochs: 50
+batch_size: 16
+image_size: 512
+num_workers: 8
+dummy_image_size: 512
+dummy_n_per_split: 128
+dummy_difficulty: medium
+dummy_label_noise: 0.0
+use_amp: true
+grad_clip_max_norm: 1.0
+optimizer: adamw
+learning_rate: 0.0001
+backbone_learning_rate: 1.0e-05
+weight_decay: 0.0001
+momentum: 0.9
+scheduler: cosine
+scheduler_step_size: 10
+scheduler_gamma: 0.1
+scheduler_patience: 5
+early_stopping: true
+early_stopping_monitor: val_loss
+early_stopping_patience: 7
+early_stopping_delta: 0.001
+threshold: 0.5
+tta_enabled: false
+tta_n: 5
+augmentation:
+  random_resized_crop:
+    enabled: true
+    scale:
+    - 0.6
+    - 1.0
+    ratio:
+    - 1.0
+    - 1.0
+  random_horizontal_flip: true
+  random_vertical_flip: false
+  random_rotation: 10
+  color_jitter:
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.1
+    hue: 0.02
+  gaussian_blur:
+    enabled: true
+    kernel_size: 5
+    sigma:
+    - 0.1
+    - 1.0
+    p: 0.1
+  random_erasing:
+    enabled: false
+    p: 0.3
+    scale:
+    - 0.02
+    - 0.15
+    ratio:
+    - 0.3
+    - 3.3
+  normalize:
+    mean:
+    - 0.485
+    - 0.456
+    - 0.406
+    std:
+    - 0.229
+    - 0.224
+    - 0.225
+data_dir: data_stufe2_512
+zuschnitt:
+  verfahren: bauteil
+  original: data_stufe2
+  referenzen: korb_referenz
+  suchbereich:
+  - 350
+  - 1200
+  - 3100
+  - 1800
+  quadratisch: true
+  masken: data_stufe2_freigestellt/masken
+csv_index: null
+log_tensorboard: true
+log_csv: true
+export_onnx: false
+xai:
+  enabled: false
+  method:
+  - integrated_gradients
+  - saliency
+  split: test
+  n_samples: all
+  overlay: true
+  ig_steps: 50
+  ig_step_batch: 8
+  occ_patch_size: 64
+  rueckprojektion:
+    enabled: true
+    stil: lauf
+    n_samples: 12
+    breite: 2000
+run_name: null

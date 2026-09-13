@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d0e0e">
+<title>io_nio_classifier — Graph-Ansicht</title>
+<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20183%20182%22%20role%3D%22img%22%20aria-label%3D%22ZEISS%22%3E%0A%20%20%3Cg%20transform%3D%22translate%28-4031%20-108%29%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4213.97%20290C4186.07%20277.48%204155.11%20270.507%204122.51%20270.507%204089.9%20270.507%204058.9%20277.48%204031%20290L4031%20108%204214%20108%204213.97%20290Z%22%20fill%3D%22%230F2DB3%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4053.12%20163.213C4044.4%20163.213%204043.69%20171.962%204043.69%20171.962L4039.53%20171.962%204039.53%20159%204072%20159C4072%20159%204072.26%20169.02%204062.65%20179.648%204062.65%20179.648%204053.51%20190.16%204053.28%20194.762L4058.54%20194.762C4066.09%20194.762%204066.87%20186.012%204066.87%20186.012L4071.21%20186.012%204071.21%20199%204038.04%20199C4038.04%20199%204036.82%20189.162%204048.33%20177.198%204048.33%20177.198%204055.41%20169.37%204057.05%20163.174L4053.12%20163.2Z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4134%20199%204134%20194.759%204133.04%20194.759C4131.3%20194.759%204129.87%20193.306%204129.87%20191.542L4129.87%20166.458C4129.87%20164.694%204131.29%20163.241%204133.04%20163.241L4134%20163.241%204134%20159%204113%20159%204113%20163.241%204113.96%20163.241C4115.74%20163.241%204117.15%20164.681%204117.15%20166.458L4117.15%20191.542C4117.15%20193.306%204115.74%20194.759%204113.96%20194.759L4113%20194.759%204113%20199%204134%20199Z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4109%20198.987%204109%20186.008%204104.68%20186.008C4104.68%20186.008%204103.89%20194.751%204096.37%20194.751L4092.05%20194.751%204092.05%20181.124%204093.59%20181.124C4095.39%20181.124%204096.84%20182.575%204096.84%20184.363L4096.84%20185.982%204101.09%20185.982%204101.09%20172.005%204096.84%20172.005%204096.84%20173.624C4096.84%20175.425%204095.39%20176.863%204093.59%20176.863L4092.05%20176.863%204092.05%20163.236%204096.37%20163.236C4103.88%20163.236%204104.68%20171.979%204104.68%20171.979L4109%20171.979%204109%20159%204075%20159%204075%20163.262%204075.98%20163.262C4077.74%20163.262%204079.2%20164.713%204079.2%20166.474L4079.2%20191.526C4079.2%20193.288%204077.76%20194.738%204075.98%20194.738L4075%20194.738%204075%20198.974%204109%20199Z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4156.99%20163.213C4165.54%20163.213%204166.21%20171.962%204166.21%20171.962L4170.33%20171.962%204170.33%20159%204139.9%20159C4139.9%20159%204135.09%20165.364%204147.67%20179.648%204147.67%20179.648%204156.58%20190.16%204156.83%20194.762L4151.7%20194.762C4144.29%20194.762%204143.5%20186.012%204143.5%20186.012L4139.24%20186.012%204139.24%20199%204169.89%20199C4169.89%20199%204175.46%20192.934%204161.66%20177.198%204161.66%20177.198%204154.43%20169.694%204153.12%20163.174L4156.99%20163.2Z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M4191.99%20163.213C4200.51%20163.213%204201.21%20171.962%204201.21%20171.962L4205.29%20171.962%204205.29%20159%204174.9%20159C4174.9%20159%204170.09%20165.364%204182.67%20179.648%204182.67%20179.648%204191.58%20190.16%204191.83%20194.762L4186.7%20194.762C4179.29%20194.762%204178.5%20186.012%204178.5%20186.012L4174.24%20186.012%204174.24%20199%204204.89%20199C4204.89%20199%204210.46%20192.934%204196.66%20177.198%204196.66%20177.198%204189.43%20169.694%204188.12%20163.174L4191.99%20163.2Z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0d0e0e;
+  --panel: #141516;
+  --panel-2: #18191a;
+  --border: #26282a;
+  --border-hi: #393c3f;
+  --text: #f4f5f4;
+  --text-2: #9da3a0;
+  --text-3: #686e6b;
+  --accent: #3ecf8e;
+  --accent-dim: rgba(62,207,142,.1);
+  --sans: 'Geist', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --ease: cubic-bezier(.16,1,.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  height: 100vh; height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text); font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+button { color: inherit; font: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+button:disabled { cursor: default; opacity: .4; }
+::selection { background: rgba(62,207,142,.25); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+[hidden] { display: none !important; }
+
+/* Feste Orientierung; der Graph bewegt sich unabhängig davon. */
+#toolbar {
+  flex: none; display: flex; align-items: center; flex-wrap: wrap;
+  column-gap: 28px; row-gap: 12px; padding: 15px 24px;
+  background: #0d0e0e; border-bottom: 1px solid var(--border); z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-logo { width: 32px; height: 32px; flex: none; }
+.brand-logo svg { display: block; width: 32px; height: 32px; }
+.brand-copy { min-width: 0; }
+.brand h1 { font-size: 14px; font-weight: 600; letter-spacing: -.025em; }
+.brand .crumb { display: block; color: var(--text-3); font-size: 11px; margin-top: 3px; }
+.filters { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.legend {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 34px; padding: 6px 10px; border: 1px solid transparent;
+  border-radius: 7px; color: var(--text-2); background: transparent;
+  font-size: 12px; white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.legend svg { flex: none; }
+.legend.active { background: rgba(255,255,255,.03); border-color: var(--border-hi); }
+.legend.inactive { color: var(--text-3); text-decoration: line-through; border-style: dashed; border-color: var(--border); }
+.legend.inactive svg { opacity: .45; }
+.legend:hover { color: var(--text); background: var(--accent-dim); border-color: var(--accent); }
+.project-meta { display: flex; align-items: center; gap: 14px; margin-left: auto; color: var(--text-3); font-size: 11px; white-space: nowrap; }
+.project-meta span + span { padding-left: 14px; border-left: 1px solid var(--border); }
+
+#graph-viewport { position: relative; min-height: 0; flex: 1; overflow: hidden; cursor: grab; touch-action: none; }
+#canvas { position: absolute; inset: 0; transform-origin: 0 0; user-select: none; }
+#graph-viewport.panning, #graph-viewport.panning * { cursor: grabbing; }
+svg#lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.col-header {
+  position: absolute; width: 240px; display: flex; align-items: center; gap: 9px;
+  color: var(--text-3); font-size: 11px; font-weight: 500; letter-spacing: .035em;
+  border-bottom: 1px solid var(--border); padding-bottom: 10px; pointer-events: none;
+}
+.col-num {
+  width: 22px; height: 22px; display: inline-grid; place-items: center;
+  border: 1px solid var(--border); border-radius: 5px; background: var(--panel-2);
+  color: var(--text-2); font-family: var(--mono); font-size: 10px;
+}
+.card {
+  position: absolute; width: 240px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: grab;
+  transition: opacity .16s, border-color .16s, box-shadow .16s; z-index: 2;
+}
+.card:hover, .card:has(:focus-visible), .card.selected { border-color: var(--border-hi); box-shadow: 0 8px 24px rgba(0,0,0,.28); z-index: 3; }
+.card:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+.card.active { cursor: grabbing; border-color: var(--accent); z-index: 4; }
+.card-inner { overflow: hidden; border-radius: 9px; }
+.card-header { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; background: var(--panel-2); border-bottom: 1px solid var(--border); }
+.card-icon { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 6px; }
+.card-icon svg { display: block; }
+.card-title { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: 12px; font-weight: 600; line-height: 1.4; }
+.info-btn { display: grid; place-items: center; flex: none; width: 26px; height: 26px; background: rgba(255,255,255,.05); border: 1px solid var(--border-hi); border-radius: 6px; color: var(--text-3); font-family: var(--mono); font-size: 12px; }
+.info-btn:hover, .info-btn.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.card-body { padding: 8px 0; }
+.file-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 12px; color: var(--text-2); font-family: var(--mono); font-size: 12px; line-height: 1.45; }
+.file-row:hover { background: rgba(255,255,255,.035); color: var(--text); }
+.file-row span { min-width: 0; overflow-wrap: anywhere; }
+.file-row .dot { width: 5px; height: 5px; flex: none; align-self: baseline; border-radius: 50%; transform: translateY(-2px); }
+.subfolder { padding: 8px 12px 4px; color: var(--text-3); font-family: var(--mono); font-size: 10px; line-height: 1.5; letter-spacing: .035em; overflow-wrap: anywhere; }
+
+.graph-footer { position: absolute; bottom: 16px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; pointer-events: none; z-index: 8; }
+#hint { max-width: 640px; padding: 8px 0; color: var(--text-3); font-size: 11px; line-height: 1.6; }
+.zoom-controls { pointer-events: auto; display: flex; align-items: center; gap: 4px; padding: 5px; border: 1px solid var(--border-hi); border-radius: 10px; background: var(--panel); box-shadow: 0 6px 20px rgba(0,0,0,.3); flex: none; }
+.zoom-controls button { height: 34px; min-width: 34px; border: 0; border-radius: 6px; background: transparent; color: var(--text-2); font-size: 18px; }
+.zoom-controls button:hover:not(:disabled) { background: var(--accent-dim); color: var(--accent); }
+.zoom-controls #zoom-value { min-width: 58px; font: 12px var(--mono); }
+.zoom-controls #fit-view { min-width: 114px; padding: 0 10px; color: var(--accent); font-size: 12px; background: var(--accent-dim); }
+.control-separator { width: 1px; height: 20px; background: var(--border-hi); margin: 0 3px; }
+
+/* Beschreibungen werden nicht mit der Zeichenfläche skaliert. */
+#info-popover { position: fixed; width: min(340px, calc(100vw - 24px)); padding: 16px; background: #101111; border: 1px solid var(--border-hi); border-radius: 10px; box-shadow: 0 16px 48px rgba(0,0,0,.5); color: var(--text-2); z-index: 40; overflow: auto; overscroll-behavior: contain; user-select: text; }
+.popover-heading { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+#info-title { font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--text); overflow-wrap: anywhere; flex: 1; }
+#close-info { flex: none; width: 28px; height: 28px; margin-top: -4px; border-radius: 5px; border: 1px solid var(--border-hi); background: transparent; color: var(--text-2); font-size: 20px; }
+#close-info:hover { color: var(--accent); border-color: var(--accent); }
+#info-lines { list-style: none; display: grid; gap: 9px; }
+#info-lines li { display: flex; gap: 9px; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+#info-lines li::before { content: '·'; color: var(--accent); flex: none; }
+
+@media (max-width: 1199px) {
+  #toolbar { column-gap: 20px; }
+  .filters { order: 3; width: 100%; border-top: 1px solid var(--border); padding-top: 10px; }
+}
+@media (max-width: 850px) { #hint { max-width: 270px; font-size: 10px; } }
+@media (max-width: 600px) {
+  #toolbar { padding: 12px 16px; column-gap: 12px; }
+  .project-meta { gap: 8px; }
+  .project-meta .framework { display: none; }
+  .project-meta span + span { padding: 0; border: 0; }
+  .filters { gap: 5px; }
+  .legend { padding: 6px 8px; font-size: 11px; }
+  #hint { display: none; }
+  .graph-footer { left: 12px; right: 12px; bottom: 12px; justify-content: flex-end; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header id="toolbar">
+  <div class="brand">
+    <div class="brand-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 183 182" role="img" aria-label="ZEISS">
+  <g transform="translate(-4031 -108)">
+    <path d="M4213.97 290C4186.07 277.48 4155.11 270.507 4122.51 270.507 4089.9 270.507 4058.9 277.48 4031 290L4031 108 4214 108 4213.97 290Z" fill="#0F2DB3" fill-rule="evenodd"/>
+    <path d="M4053.12 163.213C4044.4 163.213 4043.69 171.962 4043.69 171.962L4039.53 171.962 4039.53 159 4072 159C4072 159 4072.26 169.02 4062.65 179.648 4062.65 179.648 4053.51 190.16 4053.28 194.762L4058.54 194.762C4066.09 194.762 4066.87 186.012 4066.87 186.012L4071.21 186.012 4071.21 199 4038.04 199C4038.04 199 4036.82 189.162 4048.33 177.198 4048.33 177.198 4055.41 169.37 4057.05 163.174L4053.12 163.2Z" fill="#fff" fill-rule="evenodd"/>
+    <path d="M4134 199 4134 194.759 4133.04 194.759C4131.3 194.759 4129.87 193.306 4129.87 191.542L4129.87 166.458C4129.87 164.694 4131.29 163.241 4133.04 163.241L4134 163.241 4134 159 4113 159 4113 163.241 4113.96 163.241C4115.74 163.241 4117.15 164.681 4117.15 166.458L4117.15 191.542C4117.15 193.306 4115.74 194.759 4113.96 194.759L4113 194.759 4113 199 4134 199Z" fill="#fff" fill-rule="evenodd"/>
+    <path d="M4109 198.987 4109 186.008 4104.68 186.008C4104.68 186.008 4103.89 194.751 4096.37 194.751L4092.05 194.751 4092.05 181.124 4093.59 181.124C4095.39 181.124 4096.84 182.575 4096.84 184.363L4096.84 185.982 4101.09 185.982 4101.09 172.005 4096.84 172.005 4096.84 173.624C4096.84 175.425 4095.39 176.863 4093.59 176.863L4092.05 176.863 4092.05 163.236 4096.37 163.236C4103.88 163.236 4104.68 171.979 4104.68 171.979L4109 171.979 4109 159 4075 159 4075 163.262 4075.98 163.262C4077.74 163.262 4079.2 164.713 4079.2 166.474L4079.2 191.526C4079.2 193.288 4077.76 194.738 4075.98 194.738L4075 194.738 4075 198.974 4109 199Z" fill="#fff" fill-rule="evenodd"/>
+    <path d="M4156.99 163.213C4165.54 163.213 4166.21 171.962 4166.21 171.962L4170.33 171.962 4170.33 159 4139.9 159C4139.9 159 4135.09 165.364 4147.67 179.648 4147.67 179.648 4156.58 190.16 4156.83 194.762L4151.7 194.762C4144.29 194.762 4143.5 186.012 4143.5 186.012L4139.24 186.012 4139.24 199 4169.89 199C4169.89 199 4175.46 192.934 4161.66 177.198 4161.66 177.198 4154.43 169.694 4153.12 163.174L4156.99 163.2Z" fill="#fff" fill-rule="evenodd"/>
+    <path d="M4191.99 163.213C4200.51 163.213 4201.21 171.962 4201.21 171.962L4205.29 171.962 4205.29 159 4174.9 159C4174.9 159 4170.09 165.364 4182.67 179.648 4182.67 179.648 4191.58 190.16 4191.83 194.762L4186.7 194.762C4179.29 194.762 4178.5 186.012 4178.5 186.012L4174.24 186.012 4174.24 199 4204.89 199C4204.89 199 4210.46 192.934 4196.66 177.198 4196.66 177.198 4189.43 169.694 4188.12 163.174L4191.99 163.2Z" fill="#fff" fill-rule="evenodd"/>
+  </g>
+</svg></div>
+    <div class="brand-copy"><h1>io_nio_classifier</h1><span class="crumb">Repository / Graph-Ansicht</span></div>
+  </div>
+  <nav class="filters" aria-label="Verbindungstypen filtern">
+    <button type="button" class="legend active" data-conn-type="line-data" aria-pressed="true" title="Datenfluss-Verbindungen ein-/ausblenden"><svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="#6ea0d8" stroke-width="2" stroke-dasharray="none"/></svg>Datenfluss</button>
+    <button type="button" class="legend active" data-conn-type="line-model" aria-pressed="true" title="Modell-Verbindungen ein-/ausblenden"><svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="#d9915e" stroke-width="2" stroke-dasharray="7,4"/></svg>Modell</button>
+    <button type="button" class="legend active" data-conn-type="line-config" aria-pressed="true" title="Config-Verbindungen ein-/ausblenden"><svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="2,3"/></svg>Config</button>
+    <button type="button" class="legend active" data-conn-type="line-output" aria-pressed="true" title="Output-Verbindungen ein-/ausblenden"><svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="#c77d9e" stroke-width="2" stroke-dasharray="11,4"/></svg>Output</button>
+    <button type="button" class="legend active" data-conn-type="line-util" aria-pressed="true" title="Utils-Verbindungen ein-/ausblenden"><svg width="22" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="#c9b35e" stroke-width="2" stroke-dasharray="7,3,2,3"/></svg>Utils</button>
+  </nav>
+  <div class="project-meta" aria-label="Projektinformationen"><span class="framework">PyTorch ≥ 2.0</span><span>151 Tests</span></div>
+</header>
+<main id="graph-viewport" aria-label="Interaktive Repository-Übersicht" aria-describedby="graph-help">
+  <p id="graph-help" class="sr-only">Mit dem Mausrad zoomen, die freie Fläche oder Karten ziehen. Die Zoom-Prozentzahl setzt auf 100 Prozent zurück. Über die Info-Tasten sind Beschreibungen erreichbar. Escape schließt die Beschreibung.</p>
+  <div id="canvas"><svg id="lines" aria-hidden="true"></svg></div>
+  <div class="graph-footer">
+    <p id="hint">Mausrad: Zoom · Ziehen: Verschieben<br>Hover: Verbindungen · i: Beschreibung · Legende: Filter</p>
+    <nav class="zoom-controls" aria-label="Graphansicht steuern">
+      <button type="button" id="zoom-out" aria-label="Verkleinern" title="Verkleinern">−</button>
+      <button type="button" id="zoom-value" aria-label="Auf 100 Prozent zoomen" title="Auf 100 % zurücksetzen">100 %</button>
+      <button type="button" id="zoom-in" aria-label="Vergrößern" title="Vergrößern">+</button>
+      <span class="control-separator" aria-hidden="true"></span>
+      <button type="button" id="fit-view" title="Gesamten Graphen einpassen">Alles anzeigen</button>
+    </nav>
+  </div>
+</main>
+<aside id="info-popover" role="dialog" aria-modal="false" aria-labelledby="info-title" tabindex="-1" hidden>
+  <div class="popover-heading"><h2 id="info-title"></h2><button type="button" id="close-info" aria-label="Beschreibung schließen" title="Schließen (Escape)">×</button></div>
+  <ul id="info-lines"></ul>
+</aside>
+<script>
+const C = {
+  data:   '#6ea0d8',
+  model:  '#d9915e',
+  config: '#3ecf8e',
+  train:  '#c9b35e',
+  eval:   '#c77d9e',
+  infer:  '#cf7d72',
+  plain:  '#f4f5f4',
+  dim:    '#686e6b'
+};
+
+// Schlanke SVG-Icons (Phosphor-Stil, strokeWidth 1.5) statt Emojis
+const ic = d => `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICONS = {
+  folder:    ic('<path d="M2 5a1 1 0 0 1 1-1h3.2l1.6 1.8H13a1 1 0 0 1 1 1V12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>'),
+  terminal:  ic('<path d="M3 4.5l3.8 3.5L3 11.5M8.5 12H13"/>'),
+  sliders:   ic('<path d="M2 4.5h7M12.5 4.5H14M2 11.5h2.5M7 11.5h7"/><circle cx="10.8" cy="4.5" r="1.6"/><circle cx="5.2" cy="11.5" r="1.6"/>'),
+  play:      ic('<path d="M5 3.2v9.6L13 8 5 3.2z"/>'),
+  magnifier: ic('<circle cx="7" cy="7" r="4.2"/><path d="M10.2 10.2 14 14"/>'),
+  package:   ic('<path d="M8 1.8 14 5v6L8 14.2 2 11V5l6-3.2z"/><path d="M2 5l6 3 6-3M8 8v6"/>'),
+  cpu:       ic('<rect x="4" y="4" width="8" height="8" rx="1"/><path d="M6.5 1.8v2.2M9.5 1.8v2.2M6.5 12v2.2M9.5 12v2.2M1.8 6.5H4M1.8 9.5H4M12 6.5h2.2M12 9.5h2.2"/>'),
+  lightning: ic('<path d="M8.8 1.5 3.5 9h3.4l-.9 5.5L11.5 7H8.2l.6-5.5z"/>'),
+  wrench:    ic('<path d="M13.6 4.2a3.6 3.6 0 0 1-4.8 4.6l-4.6 4.6a1.5 1.5 0 0 1-2.1-2.1l4.6-4.6a3.6 3.6 0 0 1 4.6-4.8L9 4.2l2.1 2.1 2.5-2.1z"/>'),
+  chart:     ic('<path d="M2.5 13.5h11M4.8 13.5V8M8 13.5V4.5M11.2 13.5V6.5"/>'),
+  target:    ic('<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2.2"/>'),
+  flame:     ic('<path d="M8 1.8c.5 2.4 3.8 3.6 3.8 6.9a3.8 3.8 0 0 1-7.6 0c0-1.5.6-2.5 1.4-3.4.4.8 1 1.3 1.7 1.4C6.8 4.7 7.6 3.4 8 1.8z"/>'),
+  crop:      ic('<path d="M4.5 1.8v9.7h9.7M1.8 4.5h9.7v9.7"/>'),
+  back:      ic('<path d="M6 3.5 2.5 7 6 10.5"/><path d="M2.5 7h7a4 4 0 0 1 0 8H8"/>'),
+  grid:      ic('<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>'),
+  check:     ic('<path d="M3 8.5l3.5 3.5L13 4.5"/>')
+};
+
+const cards = [
+  // ── 1 · Quellen ────────────────────────────────────────────────────
+  {
+    id: 'configs', title: 'configs/', icon: ICONS.sliders, color: C.config, x: 110, y: 80,
+    info: [
+      'Alle Hyperparameter zentral in YAML',
+      'Backbone: resnet18 | resnet50 | efficientnet_b0 | convnext_tiny',
+      'Freeze: true (nur Kopf) | "layer4" (letzter Block + Kopf) | false',
+      'zuschnitt:-Block beschreibt, wie data_dir aus den Originalen entstand',
+      'stufe_1/ und stufe_2/: Laufconfigs des 4×3-Versuchsplans',
+      'stufe_2_basis.yaml: eingefrorene Basis, nur Backbone und Freeze variieren',
+      'head_only.yaml: Kontrollversuch, nur der Kopf wird trainiert',
+      'Jeder Lauf kopiert seine Config in den Run-Ordner'
+    ],
+    sections: [{ label: null, files: [
+      { name: 'default.yaml', dot: C.config },
+      { name: 'head_only.yaml', dot: C.config },
+      { name: 'stufe_2_basis.yaml', dot: C.config },
+      { name: 'stufe_1/  (12 Läufe)', dot: C.config },
+      { name: 'stufe_2/  (13 Läufe)', dot: C.config },
+    ]}]
+  },
+  {
+    id: 'data', title: 'data/', icon: ICONS.folder, color: C.data, x: 110, y: 300,
+    info: [
+      'Erwartete Struktur: train | val | test, je mit io/ und nio/',
+      'io = in Ordnung, nio = nicht in Ordnung (Fehlerklasse)',
+      'Im Repository leer – die Aufnahmen unterliegen dem Sperrvermerk',
+      'Abgeleitete Datensätze (z. B. data_stufe2_512) entstehen per Skript',
+      'Alternativ: CSV-Index mit Spalten path,label (csv_index)',
+      'train.py --dummy: synthetische Bilder (Kreis = io, Rechteck = nio)'
+    ],
+    sections: [{ label: null, files: [
+      { name: 'train/io/', dot: C.data }, { name: 'train/nio/', dot: C.data },
+      { name: 'val/io/',   dot: C.data }, { name: 'val/nio/',   dot: C.data },
+      { name: 'test/io/',  dot: C.data }, { name: 'test/nio/',  dot: C.data },
+    ]}]
+  },
+  {
+    id: 'scripts_daten', title: 'Datenaufbereitung', icon: ICONS.terminal, color: C.data, x: 110, y: 540,
+    info: [
+      'korb_referenz.py erstellen: Median-Bild des leeren Gitterkorbs je Zeitfenster',
+      'korb_referenz.py anwenden: Referenz abziehen, Bauteil freistellen, zuschneiden',
+      'prepare_resized_data.py: Originale (4096×3000) einmalig auf Trainingsgröße',
+      'verify_zuschnitt.py: Zuschnittfenster pixelgenau gegen die Datensatzbilder prüfen',
+      'create_dummy_data.py: synthetischer Datensatz (easy | medium | hard)',
+      'build_part_review.py: Aufnahmen über Zeitstempel physischen Bauteilen zuordnen'
+    ],
+    sections: [{ label: 'scripts/', files: [
+      { name: 'korb_referenz.py', dot: C.data },
+      { name: 'prepare_resized_data.py', dot: C.data },
+      { name: 'verify_zuschnitt.py', dot: C.data },
+      { name: 'create_dummy_data.py', dot: C.data },
+      { name: 'build_part_review.py', dot: C.data },
+    ]}]
+  },
+
+  // ── 2 · Einstieg ───────────────────────────────────────────────────
+  {
+    id: 'versuchsplan', title: 'Versuchsplan', icon: ICONS.grid, color: C.config, x: 430, y: 80,
+    info: [
+      'run_versuchsplan.py: 4 Backbones × 3 Freeze-Strategien je Versuchsstufe',
+      'Erzeugt je Lauf eine Config und startet train.py als Unterprozess',
+      'Auswahl: F1 (nio) bei Schwelle 0,5 auf test → ROC-AUC → Rechenzeit je Bild',
+      'run_xai_versuchsplan.py: Heatmaps für alle Läufe einer Stufe, mit Wiederaufnahme',
+      'run_xai_split.py: Heatmaps für einen fertigen Lauf ohne Neutraining',
+      'xai_auswahl.py: laufunabhängige Bildauswahl + Fehlklassifikationen, Manifest'
+    ],
+    sections: [{ label: 'scripts/', files: [
+      { name: 'run_versuchsplan.py', dot: C.config },
+      { name: 'run_xai_versuchsplan.py', dot: C.config },
+      { name: 'run_xai_split.py', dot: C.config },
+      { name: 'xai_auswahl.py', dot: C.config },
+    ]}]
+  },
+  {
+    id: 'train', title: 'train.py', icon: ICONS.play, color: C.plain, x: 430, y: 290,
+    info: [
+      'Haupteinstiegspunkt – führt die gesamte Pipeline aus',
+      'Seeds für Python, NumPy, PyTorch und DataLoader-Worker',
+      'Klassengewichte aus dem Trainingsset → class_info.json',
+      'Schwellenwert auf val (F1-Maximum), unverändert auf test angewendet',
+      'Strg+C: Abbruch mit Test-Evaluation des bisher besten Modells',
+      'Optional ONNX-Export und XAI, danach Rückprojektion ins Originalbild',
+      'Flags: --config, --run_name, --dummy'
+    ],
+    sections: [{ label: 'Ablauf', files: [
+      { name: '1  Config & Seed', dot: C.dim },
+      { name: '2  Run-Ordner anlegen', dot: C.dim },
+      { name: '3  DataLoader + Gewichte', dot: C.dim },
+      { name: '4  Modell bauen', dot: C.dim },
+      { name: '5  Training', dot: C.dim },
+      { name: '6  Schwelle val → test', dot: C.dim },
+      { name: '7  ONNX-Export (optional)', dot: C.dim },
+      { name: '8  XAI-Heatmaps (optional)', dot: C.dim },
+      { name: '9  Rückprojektion', dot: C.dim },
+    ]}]
+  },
+  {
+    id: 'predict', title: 'predict.py', icon: ICONS.magnifier, color: C.plain, x: 430, y: 620,
+    info: [
+      'CLI-Wrapper um src/inference/predict.py',
+      'Klassifiziert ein Einzelbild oder einen ganzen Ordner',
+      'Entscheidung: prob_nio ≥ threshold → nio',
+      '--threshold übernimmt den Betriebspunkt aus metrics/threshold.json',
+      'Ausgabe: Klasse, Konfidenz, prob_io, prob_nio – optional als CSV'
+    ],
+    sections: [{ label: 'Inference CLI', files: [
+      { name: '--checkpoint', dot: C.dim },
+      { name: '--config', dot: C.dim },
+      { name: '--input (Bild/Ordner)', dot: C.dim },
+      { name: '--output CSV', dot: C.dim },
+      { name: '--threshold', dot: C.dim },
+    ]}]
+  },
+  {
+    id: 'tests', title: 'tests/', icon: ICONS.check, color: C.config, x: 430, y: 890,
+    info: [
+      '151 Tests mit pytest, lauffähig ohne echte Bilder',
+      'test_pipeline: Dataset, Modell, Trainer, Evaluator, Inferenz',
+      'test_edge_cases: korrupte Bilder, leere Datensätze, Backbones',
+      'test_training_stability: BatchNorm-Freeze, LR-Gruppen, Scheduler, Schwelle',
+      'test_xai: IG, Saliency, Occlusion, XAI-Kennzahlen',
+      'test_rueckprojektion: Geometrie, Überlagerung, Zuschnittplan',
+      'test_xai_auswahl: Bildauswahl und Manifest',
+      'Ausführen: pytest tests/ -v'
+    ],
+    sections: [{ label: null, files: [
+      { name: 'test_pipeline.py (16)', dot: C.config },
+      { name: 'test_edge_cases.py (21)', dot: C.config },
+      { name: 'test_training_stability.py (18)', dot: C.config },
+      { name: 'test_xai.py (29)', dot: C.config },
+      { name: 'test_rueckprojektion.py (36)', dot: C.config },
+      { name: 'test_xai_auswahl.py (31)', dot: C.config },
+    ]}]
+  },
+
+  // ── 3 · Kernmodule ─────────────────────────────────────────────────
+  {
+    id: 'dataset', title: 'src/dataset.py', icon: ICONS.package, color: C.data, x: 750, y: 80,
+    info: [
+      'IODataset: lädt Bilder per Ordnerstruktur oder CSV-Index',
+      'Korrupte Bilder → schwarzes Ersatzbild mit Warnung statt Abbruch',
+      'image_size quadratisch (512) oder rechteckig [Höhe, Breite]',
+      'RandomResizedCrop mit festem Seitenverhältnis 1:1 als Skalen-Augmentation',
+      'Flip, Rotation, ColorJitter, GaussianBlur, RandomErasing per Config',
+      'Eval-Transform: nur Resize + Normalize',
+      'Optional WeightedRandomSampler für die Minderheitsklasse'
+    ],
+    sections: [{ label: null, files: [
+      { name: 'IODataset', dot: C.data },
+      { name: 'bildgroesse()', dot: C.data },
+      { name: 'build_transforms()', dot: C.data },
+      { name: '  → RandomResizedCrop', dot: C.data },
+      { name: '  → GaussianBlur / Erasing', dot: C.data },
+      { name: 'build_dataloaders()', dot: C.data },
+      { name: 'get_class_weights()', dot: C.data },
+    ]}]
+  },
+  {
+    id: 'preprocessing', title: 'src/preprocessing/', icon: ICONS.crop, color: C.data, x: 750, y: 340,
+    info: [
+      'Geometrie vom 4096×3000-Korbbild zum Modelleingang',
+      'Eine Quelle für Datensatzerzeugung und Inferenz – keine zweite Fassung',
+      'bauteil: Korbreferenz abziehen, größte Komponente, quadratisches Fenster',
+      'fest: ein Rechteck für alle Aufnahmen · ganz: kein Zuschnitt',
+      'Ergebnis immer ein Fenster (x0, y0, x1, y1) im Original',
+      'Genau dieses Fenster nutzt die Rückprojektion der Heatmaps'
+    ],
+    sections: [{ label: 'korb_zoom.py', files: [
+      { name: 'lade_referenzen()', dot: C.data },
+      { name: 'beste_referenz()', dot: C.data },
+      { name: 'bauteil_maske()', dot: C.data },
+      { name: 'zuschnitt_fenster()', dot: C.data },
+      { name: 'Zuschnittplan', dot: C.data },
+      { name: 'zuschnittplan_aus_config()', dot: C.data },
+    ]}]
+  },
+  {
+    id: 'models', title: 'src/models/', icon: ICONS.cpu, color: C.model, x: 750, y: 600,
+    info: [
+      'build_model(): vier torchvision-Backbones mit ImageNet-Gewichten',
+      'ResNet-18 (~11 M) · ResNet-50 (~25 M) · EfficientNet-B0 (~5 M) · ConvNeXt-Tiny (~28 M)',
+      'freeze_backbone: true = nur Kopf · "layer4" = letzter Block + Kopf · false = alles',
+      'layer4-Modus: bei EfficientNet/ConvNeXt die jeweils letzte Stage',
+      'Kopf: Dropout → Linear(512) → BatchNorm1d → ReLU → Dropout → Linear(2)',
+      'head_param_prefixes(): trennt Kopf und Backbone für eigene Lernraten'
+    ],
+    sections: [{ label: 'resnet.py', files: [
+      { name: 'build_model()', dot: C.model },
+      { name: 'ResNet-18 / ResNet-50', dot: C.model },
+      { name: 'EfficientNet-B0', dot: C.model },
+      { name: 'ConvNeXt-Tiny', dot: C.model },
+      { name: 'Freeze: true | layer4 | false', dot: C.model },
+      { name: '_build_head() + BatchNorm1d', dot: C.model },
+      { name: 'head_param_prefixes()', dot: C.model },
+    ]}]
+  },
+  {
+    id: 'utils', title: 'src/utils/', icon: ICONS.wrench, color: C.train, x: 750, y: 900,
+    info: [
+      'reproducibility.py: Seeds für Python, NumPy, PyTorch, CUDA und Worker',
+      'deterministic: true = bit-exakt, false = cudnn.benchmark + TF32 (schneller)',
+      'run_manager.py: Run-Ordner <timestamp>_<backbone>_lr_bs + Config-Kopie',
+      'logging_utils.py: Logger auf Konsole und train.log',
+      'plot_metrics.py: training_curves.png und val_curves.png',
+      'plot_style.py: einheitliche Palette und Achsenstil aller Diagramme'
+    ],
+    sections: [{ label: null, files: [
+      { name: 'reproducibility.py', dot: C.train },
+      { name: '  set_seed()', dot: C.dim },
+      { name: '  make_worker_init_fn()', dot: C.dim },
+      { name: 'run_manager.py', dot: C.train },
+      { name: 'logging_utils.py', dot: C.train },
+      { name: 'plot_metrics.py', dot: C.train },
+      { name: 'plot_style.py', dot: C.train },
+    ]}]
+  },
+
+  // ── 4 · Training & Inferenz ────────────────────────────────────────
+  {
+    id: 'training', title: 'src/training/', icon: ICONS.lightning, color: C.train, x: 1070, y: 200,
+    info: [
+      'CrossEntropyLoss mit Klassengewichten und Label Smoothing',
+      'Mixed Precision (autocast + GradScaler, nur CUDA) und Gradient Clipping',
+      'Parametergruppen: Kopf (learning_rate) und Backbone (backbone_learning_rate)',
+      'Scheduler: cosine | step | plateau | none, optional mit linearem Warmup',
+      'freeze_bn_stats: eingefrorene BatchNorm bleibt im Training auf eval()',
+      'best.pt nach early_stopping_monitor (val_loss | val_acc | val_f1) mit Delta',
+      'Checkpoint-Schreiben mit Wiederholung, falls die Datei gesperrt ist',
+      'CSV-Log je Epoche (loss, accuracy, f1) + TensorBoard'
+    ],
+    sections: [
+      { label: 'trainer.py', files: [
+        { name: 'Trainer', dot: C.train },
+        { name: 'AMP + Gradient Clipping', dot: C.train },
+        { name: 'build_optimizer() · 2 LR', dot: C.train },
+        { name: 'build_scheduler() · Warmup', dot: C.train },
+        { name: 'freeze_bn_stats', dot: C.train },
+        { name: 'best.pt / last.pt', dot: C.train },
+      ]},
+      { label: 'early_stopping.py', files: [
+        { name: 'EarlyStopping (min | max)', dot: C.train },
+      ]}
+    ]
+  },
+  {
+    id: 'inference', title: 'src/inference/', icon: ICONS.target, color: C.infer, x: 1070, y: 560,
+    info: [
+      'predict_single(): Schwelle statt argmax (prob_nio ≥ threshold → nio)',
+      'predict_batch(): Batch-Inferenz über einen DataLoader',
+      'Test-Time Augmentation: N Ansichten mitteln (tta_enabled, tta_n)',
+      'lade_lauf(): Config, best.pt, Transform und Betriebspunkt eines Laufs',
+      'lade_schwelle(): Betriebspunkt aus metrics/threshold.json',
+      'Transform stammt aus build_transforms(train=False) – nicht nachgebaut'
+    ],
+    sections: [
+      { label: 'predict.py', files: [
+        { name: 'predict_single() + Schwelle', dot: C.infer },
+        { name: 'predict_batch()', dot: C.infer },
+        { name: 'Test-Time Augmentation', dot: C.infer },
+        { name: 'load_model()', dot: C.infer },
+      ]},
+      { label: 'lauf.py', files: [
+        { name: 'lade_lauf()', dot: C.infer },
+        { name: 'lade_schwelle()', dot: C.infer },
+      ]}
+    ]
+  },
+
+  // ── 5 · Analyse & XAI ──────────────────────────────────────────────
+  {
+    id: 'evaluation', title: 'src/evaluation/', icon: ICONS.chart, color: C.eval, x: 1390, y: 80,
+    info: [
+      'find_best_threshold(): F1-optimale Schwelle, nur auf val gesucht',
+      'Ein Forward-Pass je Split (gecacht), danach Auswertung',
+      'Accuracy, Precision, Recall, F1 mit pos_label = 1 = nio',
+      'ROC-AUC und Average Precision (schwellenunabhängig)',
+      'Rechenzeit je Bild und trainierbare Parameter für den Backbone-Vergleich',
+      'Konfusionsmatrix, ROC-Kurve und Vorhersagen je Split (val, test)'
+    ],
+    sections: [{ label: 'evaluator.py', files: [
+      { name: 'find_best_threshold()', dot: C.eval },
+      { name: 'Evaluator.collect()', dot: C.eval },
+      { name: 'Acc / Precision / Recall / F1', dot: C.eval },
+      { name: 'ROC-AUC + Average Precision', dot: C.eval },
+      { name: 'Rechenzeit je Bild', dot: C.eval },
+      { name: 'Konfusionsmatrix + ROC', dot: C.eval },
+      { name: 'Predictions CSV', dot: C.eval },
+    ]}]
+  },
+  {
+    id: 'xai', title: 'src/xai/', icon: ICONS.flame, color: C.eval, x: 1390, y: 360,
+    info: [
+      'Integrated Gradients: pfadbasierte Attribution, in Stützpunkt-Paketen gerechnet',
+      'Saliency Map: Gradient nach dem Eingangsbild',
+      'Occlusion Map: Bildbereiche abdecken, Änderung der Vorhersage messen',
+      'Methodenwahl in der Config: xai.method (auch all)',
+      'Konzentrationsfaktor: Attributionsanteil auf dem Bauteil / Flächenanteil',
+      'Maskensensitivität, Deletion/Insertion (maskenfrei), Sanity-Check',
+      'Ohne Captum – reines PyTorch'
+    ],
+    sections: [
+      { label: 'integrated_gradients.py', files: [
+        { name: 'integrated_gradients()', dot: C.eval },
+        { name: 'saliency_map()', dot: C.eval },
+        { name: 'occlusion_map()', dot: C.eval },
+        { name: 'run_xai()', dot: C.eval },
+      ]},
+      { label: 'metriken.py', files: [
+        { name: 'konzentrationsfaktor()', dot: C.eval },
+        { name: 'maskensensitivitaet()', dot: C.eval },
+        { name: 'deletion_insertion()', dot: C.eval },
+        { name: 'sanity_spearman()', dot: C.eval },
+      ]}
+    ]
+  },
+  {
+    id: 'rueckprojektion', title: 'Rückprojektion', icon: ICONS.back, color: C.eval, x: 1390, y: 700,
+    info: [
+      'Zuschnitt + Skalierung sind affin – die Umkehrung ist verlustfrei',
+      'Karte auf Fenstergröße skalieren und an (x0, y0) ins Original einsetzen',
+      'sx und sy getrennt: funktioniert auch bei rechteckigem Eingang (800×320)',
+      'ueberlagern(): Stile lauf | thesis | demo',
+      'lauf_bilder.py: am Trainingsende automatisch, ein Ordner je Aufnahme',
+      'Scheitert weich: fehlt der Originalordner, gibt es nur eine Logzeile'
+    ],
+    sections: [
+      { label: 'src/xai/rueckprojektion.py', files: [
+        { name: 'karte_ins_original()', dot: C.eval },
+        { name: 'ueberlagern()', dot: C.eval },
+        { name: 'anteil_in_maske()', dot: C.eval },
+      ]},
+      { label: 'src/xai/lauf_bilder.py', files: [
+        { name: 'rueckprojektion_nach_training()', dot: C.eval },
+        { name: 'schreibe_bildordner()', dot: C.eval },
+      ]}
+    ]
+  },
+
+  // ── 6 · Ergebnis ───────────────────────────────────────────────────
+  {
+    id: 'outputs', title: 'outputs/', icon: ICONS.folder, color: C.eval, x: 1710, y: 80,
+    info: [
+      'runs/<run>/: automatisch angelegter Ordner je Trainingslauf',
+      'Name: <timestamp>_<backbone>_lr<lr>_bs<bs> oder --run_name',
+      'best.pt / last.pt enthalten Modell, Optimizer-Zustand und Config',
+      'threshold.json: auf val bestimmter Betriebspunkt',
+      'runs/Stufe_<N>/: Läufe und Vergleichstabellen des Versuchsplans',
+      'Im Repository: Configs, Metriken und Vergleichstabellen – keine Modelle, keine Bilder'
+    ],
+    sections: [
+      { label: 'runs/<run>/', files: [
+        { name: 'config.yaml · train.log', dot: C.config },
+        { name: 'tensorboard/', dot: C.train },
+        { name: 'model.onnx (optional)', dot: C.model },
+      ]},
+      { label: 'checkpoints/', files: [
+        { name: 'best.pt', dot: C.model },
+        { name: 'last.pt', dot: C.model },
+      ]},
+      { label: 'metrics/', files: [
+        { name: 'train_ / val_metrics.csv', dot: C.eval },
+        { name: 'val_ / test_metrics.json', dot: C.eval },
+        { name: 'threshold.json', dot: C.eval },
+        { name: 'class_info.json', dot: C.eval },
+        { name: 'confusion_matrix · roc_curve', dot: C.eval },
+        { name: 'training_ / val_curves.png', dot: C.eval },
+      ]},
+      { label: 'preds/', files: [
+        { name: 'example_predictions.csv', dot: C.eval },
+      ]},
+      { label: 'xai/', files: [
+        { name: 'integrated_gradients/', dot: C.eval },
+        { name: 'rueckprojektion/<aufnahme>/', dot: C.eval },
+      ]},
+      { label: 'weitere', files: [
+        { name: 'runs/Stufe_<N>/', dot: C.dim },
+        { name: 'pipeline/<lauf>_<split>/', dot: C.dim },
+        { name: 'xai_sichtung/', dot: C.dim },
+      ]},
+    ]
+  },
+  {
+    id: 'pipeline', title: 'Original-Pipeline', icon: ICONS.terminal, color: C.infer, x: 1710, y: 700,
+    info: [
+      'Original → Zoom → CNN → XAI → Heatmap zurück ins Original',
+      'Für jeden Lauf und jeden Datensatz (bauteil | fest | ganz)',
+      'Prüft den zuschnitt:-Block beim Start pixelweise gegen die Datensatzbilder',
+      'Abnahme: Vorwärtslauf aus Original und aus Datensatzbild exakt gleich',
+      'Ausgabe: outputs/pipeline/<lauf>_<split>/ mit overlay/ und zoom/'
+    ],
+    sections: [{ label: 'scripts/pipeline_original.py', files: [
+      { name: 'zuschnitt:-Block prüfen', dot: C.infer },
+      { name: 'Original → Zoomfenster', dot: C.infer },
+      { name: 'CNN + Schwelle', dot: C.infer },
+      { name: 'XAI-Karten', dot: C.infer },
+      { name: 'Karte ins Original', dot: C.infer },
+    ]}]
+  },
+
+  // ── 7 · Auswertung ─────────────────────────────────────────────────
+  {
+    id: 'auswertung', title: 'Auswertung', icon: ICONS.chart, color: C.eval, x: 2030, y: 200,
+    info: [
+      'threshold_analyse.py: Schwellenraster und Übertragbarkeit val → test',
+      'benchmark_inferenz.py: Inferenzzeit je Backbone, Median über Wiederholungen',
+      'xai_kennzahlen.py: quantitative XAI-Bewertung auf dem besten Modell',
+      'xai_sichtung.py: verblindete Sichtung der Karten nach festem Schema',
+      'kap5_daten.py: eine Datenquelle für alle Ergebnistabellen und Diagramme',
+      'thesis_kap5_abbildungen*.py: Diagramme des Ergebniskapitels als SVG'
+    ],
+    sections: [{ label: 'scripts/', files: [
+      { name: 'threshold_analyse.py', dot: C.eval },
+      { name: 'benchmark_inferenz.py', dot: C.eval },
+      { name: 'xai_kennzahlen.py', dot: C.eval },
+      { name: 'xai_sichtung.py', dot: C.eval },
+      { name: 'kap5_daten.py', dot: C.eval },
+      { name: 'thesis_kap5_abbildungen.py', dot: C.eval },
+      { name: '  … _matplotlib.py', dot: C.eval },
+    ]}]
+  },
+];
+
+const connections = [
+  // Quellen
+  ['scripts_daten',  'data',            'line-data',   'Datensatz erzeugen'],
+  ['preprocessing',  'scripts_daten',   'line-util',   'Zuschnittgeometrie'],
+  ['data',           'dataset',         'line-data',   'Bilder laden'],
+  ['configs',        'train',           'line-config', 'Config einlesen'],
+  ['configs',        'dataset',         'line-config', 'Bildgröße & Augmentation'],
+  ['configs',        'preprocessing',   'line-config', 'zuschnitt:-Block'],
+  ['configs',        'models',          'line-config', 'Backbone & Freeze'],
+  ['configs',        'training',        'line-config', 'Hyperparameter'],
+  ['configs',        'xai',             'line-config', 'XAI-Einstellungen'],
+  // Versuchsplan
+  ['versuchsplan',   'configs',         'line-config', 'Laufconfigs erzeugen'],
+  ['versuchsplan',   'train',           'line-util',   'Lauf starten'],
+  ['versuchsplan',   'xai',             'line-output', 'Heatmaps nachrechnen'],
+  // train.py
+  ['train',          'utils',           'line-util',   'Seed & Run-Ordner'],
+  ['train',          'dataset',         'line-data',   'Daten vorbereiten'],
+  ['train',          'models',          'line-model',  'Modell bauen'],
+  ['train',          'training',        'line-util',   'Training starten'],
+  ['train',          'evaluation',      'line-output', 'Schwelle val → test'],
+  ['train',          'xai',             'line-output', 'Heatmaps erstellen'],
+  ['train',          'rueckprojektion', 'line-output', 'Rückprojektion'],
+  // Kernmodule
+  ['dataset',        'training',        'line-data',   'Batches liefern'],
+  ['dataset',        'evaluation',      'line-data',   'val/test liefern'],
+  ['dataset',        'inference',       'line-data',   'Eval-Transform'],
+  ['models',         'training',        'line-model',  'Gewichte trainieren'],
+  ['models',         'inference',       'line-model',  'Modell laden'],
+  ['utils',          'training',        'line-util',   'Logger'],
+  ['utils',          'evaluation',      'line-util',   'Diagrammstil'],
+  ['preprocessing',  'rueckprojektion', 'line-util',   'Zoomfenster'],
+  ['preprocessing',  'pipeline',        'line-util',   'Zuschnitt'],
+  // Inferenz
+  ['predict',        'inference',       'line-data',   'Aufruf weiterleiten'],
+  ['inference',      'pipeline',        'line-model',  'lade_lauf()'],
+  // Analyse
+  ['xai',            'rueckprojektion', 'line-model',  'Attributionskarten'],
+  ['rueckprojektion','pipeline',        'line-output', 'Karte ins Original'],
+  // Ergebnis
+  ['training',       'outputs',         'line-output', 'Checkpoints & Logs'],
+  ['evaluation',     'outputs',         'line-output', 'Metriken & Schwelle'],
+  ['xai',            'outputs',         'line-output', 'Heatmaps speichern'],
+  ['rueckprojektion','outputs',         'line-output', 'rueckprojektion/'],
+  ['pipeline',       'outputs',         'line-output', 'pipeline/'],
+  // Auswertung
+  ['outputs',        'auswertung',      'line-output', 'Ergebnisse auswerten'],
+  ['xai',            'auswertung',      'line-model',  'XAI-Kennzahlen'],
+  // Tests
+  ['tests',          'scripts_daten',   'line-config', 'Dummy-Daten'],
+  ['tests',          'dataset',         'line-config', 'Dataset testen'],
+  ['tests',          'models',          'line-config', 'Modell testen'],
+  ['tests',          'training',        'line-config', 'Training testen'],
+  ['tests',          'evaluation',      'line-config', 'Auswertung testen'],
+  ['tests',          'inference',       'line-config', 'Vorhersage testen'],
+  ['tests',          'xai',             'line-config', 'XAI testen'],
+  ['tests',          'rueckprojektion', 'line-config', 'Geometrie testen'],
+];
+
+// ── COLUMN HEADERS ──────────────────────────────────────────────────
+const columnHeaders = [
+  { num: '1', label: 'Quellen',             x: 110,  y: 35 },
+  { num: '2', label: 'Einstieg',            x: 430,  y: 35 },
+  { num: '3', label: 'Kernmodule',          x: 750,  y: 35 },
+  { num: '4', label: 'Training & Inferenz', x: 1070, y: 35 },
+  { num: '5', label: 'Analyse & XAI',       x: 1390, y: 35 },
+  { num: '6', label: 'Ergebnis',            x: 1710, y: 35 },
+  { num: '7', label: 'Auswertung',          x: 2030, y: 35 },
+];
+
+// ── RENDER ──────────────────────────────────────────────────────────
+const viewport = document.getElementById('graph-viewport');
+const canvas = document.getElementById('canvas');
+const svgEl = document.getElementById('lines');
+const popover = document.getElementById('info-popover');
+const zoomValue = document.getElementById('zoom-value');
+const cardEls = {};
+const headerEls = [];
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const dashPatterns = { 'line-data': 'none', 'line-model': '7,4', 'line-config': '2,3', 'line-output': '11,4', 'line-util': '7,3,2,3' };
+const visibleTypes = Object.fromEntries(Object.keys(dashPatterns).map(type => [type, true]));
+const VIEW_KEY = 'ionio_graph_view_v2';
+const MIN_SCALE = 0.1, MAX_SCALE = 2;
+let panX = 0, panY = 0, scale = 1;
+let drag = null, hoveredCard = null, openInfo = null, fitted = false, initialized = false;
+let previousSize = { width: 0, height: 0 };
+
+columnHeaders.forEach(h => {
+  const el = document.createElement('div');
+  el.className = 'col-header';
+  el.style.left = h.x + 'px'; el.style.top = h.y + 'px';
+  el.innerHTML = `<span class="col-num">${h.num}</span>${esc(h.label)}`;
+  canvas.appendChild(el); headerEls.push(el);
+});
+
+cards.forEach(c => {
+  const el = document.createElement('section');
+  el.className = 'card'; el.id = 'card-' + c.id; el.dataset.id = c.id;
+  el.setAttribute('aria-labelledby', 'title-' + c.id);
+  el.style.left = c.x + 'px'; el.style.top = c.y + 'px';
+  const sections = c.sections.map(sec =>
+    (sec.label ? `<div class="subfolder">${esc(sec.label)}</div>` : '') +
+    sec.files.map(f => `<div class="file-row"><span class="dot" style="background:${f.dot}" aria-hidden="true"></span><span>${esc(f.name)}</span></div>`).join('')
+  ).join('');
+  el.innerHTML = `<div class="card-inner">
+    <div class="card-header">
+      <span class="card-icon" style="background:${c.color}1f;color:${c.color}" aria-hidden="true">${c.icon}</span>
+      <h2 class="card-title" id="title-${c.id}" style="color:${c.color === C.plain ? 'var(--text)' : c.color}">${esc(c.title)}</h2>
+      <button type="button" class="info-btn" data-id="${c.id}" aria-label="Beschreibung: ${esc(c.title)}" aria-controls="info-popover" aria-expanded="false" aria-haspopup="dialog" title="Beschreibung anzeigen">i</button>
+    </div><div class="card-body">${sections}</div></div>`;
+  canvas.appendChild(el); cardEls[c.id] = el;
+  el.addEventListener('pointerenter', () => { hoveredCard = c.id; refreshHighlight(); });
+  el.addEventListener('pointerleave', () => { if (hoveredCard === c.id) hoveredCard = null; refreshHighlight(); });
+});
+
+// Die ursprüngliche Reihenfolge bleibt; mehrzeilige Dateinamen brauchen Platz.
+function layoutCards() {
+  columnHeaders.forEach(column => {
+    const header = headerEls.find(el => parseFloat(el.style.left) === column.x);
+    let nextY = column.y + header.offsetHeight + 24;
+    cards.filter(c => c.x === column.x).sort((a, b) => a.y - b.y).forEach(c => {
+      const el = cardEls[c.id];
+      el.style.top = Math.max(c.y, nextY) + 'px';
+      nextY = parseFloat(el.style.top) + el.offsetHeight + 32;
+    });
+  });
+}
+
+function getRect(id) {
+  const el = cardEls[id];
+  const x = parseFloat(el.style.left), y = parseFloat(el.style.top);
+  const w = el.offsetWidth, h = el.offsetHeight;
+  return { x: x+w/2, y: y+h/2, l: x, t: y, r: x+w, b: y+h };
+}
+
+function drawLines() {
+  svgEl.innerHTML = '';
+  const colors = {
+    'line-data':'#6ea0d8','line-model':'#d9915e',
+    'line-config':'#3ecf8e','line-output':'#c77d9e','line-util':'#c9b35e'
+  };
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  Object.entries(colors).forEach(([cls,col]) => {
+    const m = document.createElementNS('http://www.w3.org/2000/svg','marker');
+    m.setAttribute('id','arrow-'+cls); m.setAttribute('markerWidth','6');
+    m.setAttribute('markerHeight','5'); m.setAttribute('viewBox','0 0 6 5');
+    m.setAttribute('markerUnits','userSpaceOnUse');
+    m.setAttribute('refX','6'); m.setAttribute('refY','2.5'); m.setAttribute('orient','auto');
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M0,0 L0,5 L6,2.5 z'); p.setAttribute('fill',col);
+    p.setAttribute('fill-opacity','0.75');
+    m.appendChild(p); defs.appendChild(m);
+  });
+  svgEl.appendChild(defs);
+
+  const deferredLabels = [];
+
+  connections.forEach(([from,to,cls,label]) => {
+    if (!visibleTypes[cls]) return;
+    const a = getRect(from), b = getRect(to);
+    // Kontrollpunkte der kubischen Bézierkurve
+    let x1,y1,x2,y2,c1x,c1y,c2x,c2y;
+    if (Math.abs(a.x - b.x) < 40) {
+      // gleiche Spalte: links aus der Karte heraus, im Bogen zurück
+      x1=a.l; y1=a.y; x2=b.l; y2=b.y;
+      c1x=x1-70; c1y=y1; c2x=x2-70; c2y=y2;
+    } else {
+      if (b.x >= a.x) { x1=a.r; y1=a.y; x2=b.l; y2=b.y; }
+      else            { x1=a.l; y1=a.y; x2=b.r; y2=b.y; }
+      const mx=(x1+x2)/2;
+      c1x=mx; c1y=y1; c2x=mx; c2y=y2;
+    }
+    const col=colors[cls];
+    const dash=dashPatterns[cls]||'none';
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${x1},${y1} C${c1x},${c1y} ${c2x},${c2y} ${x2},${y2}`);
+    path.setAttribute('fill','none'); path.setAttribute('stroke',col);
+    path.setAttribute('stroke-width','1.6'); path.setAttribute('opacity','0.55');
+    if(dash!=='none') path.setAttribute('stroke-dasharray',dash);
+    path.setAttribute('marker-end',`url(#arrow-${cls})`);
+    path.classList.add('conn-path');
+    path.dataset.from=from; path.dataset.to=to; path.dataset.type=cls;
+    svgEl.appendChild(path);
+    if (label) {
+      const tw=label.length*5.8+12, th=16;
+      function evalBez(t_) {
+        const u=1-t_;
+        return {
+          x: u*u*u*x1 + 3*u*u*t_*c1x + 3*u*t_*t_*c2x + t_*t_*t_*x2,
+          y: u*u*u*y1 + 3*u*u*t_*c1y + 3*u*t_*t_*c2y + t_*t_*t_*y2
+        };
+      }
+      function hitsCard(px, py) {
+        for (const el of Object.values(cardEls)) {
+          const cl=parseFloat(el.style.left), ct=parseFloat(el.style.top);
+          const cr=cl+el.offsetWidth, cb=ct+el.offsetHeight;
+          if (px+tw/2>cl && px-tw/2<cr && py>ct-th && py<cb) return true;
+        }
+        return false;
+      }
+      const tryTs=[0.5,0.45,0.55,0.4,0.6,0.35,0.65,0.3,0.7,0.25,0.75,0.2,0.8,0.15,0.85];
+      let lx, ly, found=false;
+      for (const tt of tryTs) {
+        const pt=evalBez(tt);
+        if (!hitsCard(pt.x, pt.y-5)) { lx=pt.x; ly=pt.y-5; found=true; break; }
+      }
+      if (!found) { const pt=evalBez(0.5); lx=pt.x; ly=pt.y-5; }
+      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      const bx = lx - tw / 2;
+      const by = ly - th + 3;
+      bg.setAttribute('x', bx); bg.setAttribute('y', by);
+      bg.setAttribute('width', tw); bg.setAttribute('height', th);
+      bg.setAttribute('rx','3'); bg.setAttribute('fill','#0d0e0e'); bg.setAttribute('opacity','0.85');
+      bg.classList.add('conn-label'); bg.dataset.from=from; bg.dataset.to=to; bg.dataset.type=cls;
+      bg.dataset.baseX = bx; bg.dataset.baseY = by;
+      bg.dataset.baseW = tw; bg.dataset.baseH = th;
+      deferredLabels.push(bg);
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',lx); t.setAttribute('y',ly);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','10');
+      t.setAttribute('fill',col); t.setAttribute('opacity','0.85');
+      t.setAttribute('font-family','Geist, Segoe UI, sans-serif');
+      t.classList.add('conn-label'); t.dataset.from=from; t.dataset.to=to; t.dataset.type=cls;
+      t.dataset.baseFont = '10'; t.dataset.baseY = ly;
+      t.textContent=label; deferredLabels.push(t);
+    }
+  });
+
+  deferredLabels.forEach(el => svgEl.appendChild(el));
+  refreshHighlight();
+}
+
+
+
+// Hervorhebung berücksichtigt Filter, Maus, Tastatur und offene Beschreibung.
+function refreshHighlight() {
+  const activeElement = document.activeElement;
+  const focused = activeElement?.matches(':focus-visible') ? activeElement.closest('.card')?.dataset.id : null;
+  const id = drag?.id || hoveredCard || openInfo || focused || null;
+  svgEl.querySelectorAll('.conn-path').forEach(path => {
+    const match = path.dataset.from === id || path.dataset.to === id;
+    // Den gesamten Pfad samt Pfeilspitze ausblenden, nicht nur den Linienstrich.
+    path.setAttribute('opacity', id ? (match ? '1' : '0.035') : '0.55');
+    path.setAttribute('stroke-width', id && match ? '2.6' : '1.6');
+  });
+  svgEl.querySelectorAll('.conn-label').forEach(label => {
+    const match = label.dataset.from === id || label.dataset.to === id;
+    label.setAttribute('opacity', id ? (match ? '1' : '0.04') : '0.85');
+  });
+  const adjacent = new Set(id ? [id] : []);
+  if (id) connections.forEach(([from, to, type]) => {
+    if (visibleTypes[type] && (from === id || to === id)) { adjacent.add(from); adjacent.add(to); }
+  });
+  Object.entries(cardEls).forEach(([cid, el]) => {
+    el.style.opacity = !id || adjacent.has(cid) ? '1' : '0.16';
+    el.classList.toggle('selected', cid === id);
+  });
+}
+
+document.querySelectorAll('.legend').forEach(button => {
+  button.addEventListener('click', () => {
+    const type = button.dataset.connType;
+    visibleTypes[type] = !visibleTypes[type];
+    button.setAttribute('aria-pressed', String(visibleTypes[type]));
+    button.classList.toggle('active', visibleTypes[type]);
+    button.classList.toggle('inactive', !visibleTypes[type]);
+    drawLines();
+  });
+});
+
+// ── INFOBOX AUSSERHALB DER ZOOMFLÄCHE ─────────────────────────────────
+function positionInfo() {
+  if (!openInfo) return;
+  const anchor = cardEls[openInfo].getBoundingClientRect();
+  const area = viewport.getBoundingClientRect();
+  const margin = 12;
+  const topLimit = area.top + margin;
+  popover.style.maxHeight = Math.max(80, area.height - 2 * margin) + 'px';
+  const width = popover.offsetWidth, height = popover.offsetHeight;
+  let left = anchor.right + margin;
+  if (left + width > window.innerWidth - margin) left = anchor.left - width - margin;
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+  const top = Math.max(topLimit, Math.min(anchor.top, window.innerHeight - height - margin));
+  popover.style.left = left + 'px'; popover.style.top = top + 'px';
+}
+
+function closeInfo(returnFocus = false) {
+  if (!openInfo) return;
+  const button = cardEls[openInfo].querySelector('.info-btn');
+  const activeElement = document.activeElement;
+  const releaseFocus = activeElement === button || popover.contains(activeElement);
+  button.classList.remove('active'); button.setAttribute('aria-expanded', 'false');
+  openInfo = null; popover.hidden = true;
+  if (returnFocus) button.focus({ preventScroll: true });
+  else if (releaseFocus) activeElement?.blur();
+  refreshHighlight();
+}
+
+function toggleInfo(id, keyboardActivation = false) {
+  if (openInfo === id) { closeInfo(keyboardActivation); return; }
+  closeInfo();
+  openInfo = id;
+  const c = cards.find(item => item.id === id);
+  document.getElementById('info-title').textContent = c.title;
+  document.getElementById('info-lines').innerHTML = (c.info || []).map(line => `<li>${esc(line)}</li>`).join('');
+  const button = cardEls[id].querySelector('.info-btn');
+  button.classList.add('active'); button.setAttribute('aria-expanded', 'true');
+  popover.hidden = false; popover.scrollTop = 0;
+  positionInfo(); popover.focus({ preventScroll: true }); refreshHighlight();
+}
+
+// Außenklick schon vor Pointer Capture und dem Verschieben behandeln.
+document.addEventListener('pointerdown', e => {
+  if (openInfo && !popover.contains(e.target) && !e.target.closest('.info-btn')) closeInfo();
+}, true);
+document.addEventListener('click', e => {
+  const button = e.target.closest('.info-btn');
+  const keyboardActivation = e.detail === 0;
+  if (button) { toggleInfo(button.dataset.id, keyboardActivation); return; }
+  if (e.target.closest('#close-info')) { closeInfo(keyboardActivation); return; }
+  if (!popover.contains(e.target)) closeInfo();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && openInfo) { e.preventDefault(); closeInfo(true); }
+});
+document.addEventListener('focusin', e => {
+  if (openInfo && !popover.contains(e.target) && !e.target.closest('.info-btn')) closeInfo();
+  const card = e.target.closest('.card');
+  if (card && e.target.matches(':focus-visible')) ensureCardVisible(card.dataset.id);
+  refreshHighlight();
+});
+document.addEventListener('focusout', () => requestAnimationFrame(refreshHighlight));
+
+// ── ANSICHT UND KOORDINATEN ──────────────────────────────────────────
+function viewportSize() { return { width: viewport.clientWidth, height: viewport.clientHeight }; }
+function graphBounds() {
+  const boxes = [...Object.values(cardEls), ...headerEls].map(el => ({
+    l: parseFloat(el.style.left), t: parseFloat(el.style.top),
+    r: parseFloat(el.style.left) + el.offsetWidth,
+    b: parseFloat(el.style.top) + el.offsetHeight
+  }));
+  // Links Platz für die Verbindungsbögen innerhalb einer Spalte lassen.
+  return { l: Math.min(...boxes.map(b => b.l)) - 80, t: Math.min(...boxes.map(b => b.t)),
+    r: Math.max(...boxes.map(b => b.r)) + 12, b: Math.max(...boxes.map(b => b.b)) + 12 };
+}
+function usableArea() {
+  const { width, height } = viewportSize();
+  const padding = width < 850 ? 20 : 32;
+  const footer = document.querySelector('.graph-footer');
+  const bottom = Math.max(76, footer.offsetHeight + 32);
+  return { x: padding, y: padding, width: Math.max(1, width - padding * 2), height: Math.max(1, height - padding - bottom) };
+}
+function applyView() {
+  canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  zoomValue.textContent = `${Math.round(scale * 100)} %`;
+  zoomValue.setAttribute('aria-label', `Zoom ${Math.round(scale * 100)} Prozent. Auf 100 Prozent zurücksetzen`);
+  document.getElementById('zoom-out').disabled = scale <= MIN_SCALE;
+  document.getElementById('zoom-in').disabled = scale >= MAX_SCALE;
+  positionInfo();
+}
+function saveView() {
+  try {
+    const { width, height } = viewportSize();
+    localStorage.setItem(VIEW_KEY, JSON.stringify({ panX, panY, scale, fitted, width, height }));
+  } catch (_) { /* Die lokale HTML-Datei funktioniert auch ohne Web Storage. */ }
+}
+function fitView(persist = true) {
+  const bounds = graphBounds(), area = usableArea();
+  scale = Math.min(1, area.width / (bounds.r - bounds.l), area.height / (bounds.b - bounds.t));
+  scale = Math.max(MIN_SCALE, scale);
+  panX = area.x + (area.width - (bounds.r - bounds.l) * scale) / 2 - bounds.l * scale;
+  panY = area.y + (area.height - (bounds.b - bounds.t) * scale) / 2 - bounds.t * scale;
+  fitted = true; applyView(); if (persist) saveView();
+}
+function viewHasVisibleCard() {
+  const area = usableArea();
+  return Object.keys(cardEls).some(id => {
+    const r = getRect(id);
+    const overlapX = Math.min(panX + r.r * scale, area.x + area.width) - Math.max(panX + r.l * scale, area.x);
+    const overlapY = Math.min(panY + r.b * scale, area.y + area.height) - Math.max(panY + r.t * scale, area.y);
+    return overlapX >= Math.min(60, (r.r - r.l) * scale / 2) && overlapY >= Math.min(40, (r.b - r.t) * scale / 2);
+  });
+}
+function restoreView() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VIEW_KEY));
+    if (!saved || !['panX', 'panY', 'scale'].every(key => Number.isFinite(saved[key])) || saved.scale < MIN_SCALE || saved.scale > MAX_SCALE) return false;
+    if (saved.fitted === true) { fitView(false); return true; }
+    panX = saved.panX; panY = saved.panY; scale = saved.scale;
+    const size = viewportSize();
+    if (Number.isFinite(saved.width) && saved.width > 0 && Number.isFinite(saved.height) && saved.height > 0) {
+      panX += (size.width - saved.width) / 2; panY += (size.height - saved.height) / 2;
+    }
+    if (!viewHasVisibleCard()) return false;
+    fitted = false; applyView(); return true;
+  } catch (_) { return false; }
+}
+function zoomAt(nextScale, x, y) {
+  const clamped = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale));
+  const worldX = (x - panX) / scale, worldY = (y - panY) / scale;
+  panX = x - worldX * clamped; panY = y - worldY * clamped;
+  scale = clamped; fitted = false; applyView(); saveView();
+}
+function zoomFromCenter(nextScale) {
+  const size = viewportSize(); zoomAt(nextScale, size.width / 2, size.height / 2);
+}
+function ensureCardVisible(id) {
+  const r = getRect(id), area = usableArea();
+  const width = (r.r - r.l) * scale, height = (r.b - r.t) * scale;
+  const left = panX + r.l * scale, top = panY + r.t * scale;
+  let dx = 0, dy = 0;
+  if (left < area.x || left + width > area.x + area.width) dx = area.x + (area.width - width) / 2 - left;
+  if (top < area.y || top + height > area.y + area.height) dy = area.y + Math.max(0, (area.height - height) / 2) - top;
+  if (dx || dy) { panX += dx; panY += dy; fitted = false; applyView(); saveView(); }
+  viewport.scrollLeft = 0; viewport.scrollTop = 0;
+}
+document.getElementById('zoom-out').addEventListener('click', () => zoomFromCenter(scale / 1.2));
+document.getElementById('zoom-in').addEventListener('click', () => zoomFromCenter(scale * 1.2));
+zoomValue.addEventListener('click', () => zoomFromCenter(1));
+document.getElementById('fit-view').addEventListener('click', () => fitView());
+viewport.addEventListener('wheel', e => {
+  if (e.target.closest('.graph-footer')) return;
+  e.preventDefault();
+  if (drag) return;
+  const area = viewport.getBoundingClientRect();
+  const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? area.height : 1);
+  zoomAt(scale * Math.exp(-Math.max(-240, Math.min(240, delta)) * .002), e.clientX - area.left, e.clientY - area.top);
+}, { passive: false });
+
+// Pointer Capture hält auch Ziehbewegungen außerhalb der Karte zusammen.
+viewport.addEventListener('pointerdown', e => {
+  if (!initialized || e.button !== 0 || !e.isPrimary || e.target.closest('button, .graph-footer')) return;
+  const card = e.target.closest('.card');
+  e.preventDefault();
+  drag = { pointerId: e.pointerId, id: card?.dataset.id || null, startX: e.clientX, startY: e.clientY,
+    x: card ? parseFloat(card.style.left) : panX, y: card ? parseFloat(card.style.top) : panY };
+  viewport.setPointerCapture(e.pointerId);
+  if (card) card.classList.add('active'); else viewport.classList.add('panning');
+});
+viewport.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  const dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
+  if (drag.id) {
+    const el = cardEls[drag.id];
+    el.style.left = drag.x + dx / scale + 'px'; el.style.top = drag.y + dy / scale + 'px';
+    drawLines(); positionInfo();
+  } else { panX = drag.x + dx; panY = drag.y + dy; fitted = false; applyView(); }
+});
+function finishDrag(e) {
+  if (!drag || (e?.pointerId != null && e.pointerId !== drag.pointerId)) return;
+  const finished = drag; drag = null;
+  if (finished.id) cardEls[finished.id].classList.remove('active');
+  viewport.classList.remove('panning');
+  if (viewport.hasPointerCapture(finished.pointerId)) viewport.releasePointerCapture(finished.pointerId);
+  hoveredCard = null; refreshHighlight(); saveView();
+  if (pendingFontLayout) { pendingFontLayout = false; relayoutForFonts(); }
+}
+viewport.addEventListener('pointerup', finishDrag);
+viewport.addEventListener('pointercancel', finishDrag);
+viewport.addEventListener('lostpointercapture', finishDrag);
+window.addEventListener('blur', () => finishDrag());
+
+function handleResize() {
+  if (!initialized) return;
+  const size = viewportSize();
+  if (size.width === previousSize.width && size.height === previousSize.height) { positionInfo(); return; }
+  if (fitted) fitView(false);
+  else {
+    panX += (size.width - previousSize.width) / 2; panY += (size.height - previousSize.height) / 2;
+    if (!viewHasVisibleCard()) fitView(false); else applyView();
+  }
+  previousSize = size; saveView();
+}
+function relayoutForFonts() {
+  if (drag) {
+    pendingFontLayout = true;
+    return;
+  }
+  // Keine manuell verschobenen Karten zurücksetzen: nur Kollisionen je Spalte nach unten auflösen.
+  columnHeaders.forEach(column => {
+    const ordered = Object.values(cardEls).filter(el => parseFloat(el.style.left) === column.x)
+      .sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+    let nextY = column.y + headerEls.find(el => parseFloat(el.style.left) === column.x).offsetHeight + 24;
+    ordered.forEach(el => { el.style.top = Math.max(parseFloat(el.style.top), nextY) + 'px'; nextY = parseFloat(el.style.top) + el.offsetHeight + 32; });
+  });
+  drawLines(); if (fitted) fitView(); else { applyView(); saveView(); }
+}
+let pendingFontLayout = false;
+
+layoutCards(); drawLines();
+if (!restoreView()) fitView(false);
+initialized = true; previousSize = viewportSize(); saveView();
+new ResizeObserver(handleResize).observe(viewport);
+document.fonts?.ready.then(relayoutForFonts);
+
+</script>
+</body>
+</html>

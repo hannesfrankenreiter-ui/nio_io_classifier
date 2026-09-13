@@ -1,0 +1,12 @@
+{
+  "class_counts": {
+    "io": 700,
+    "nio": 700
+  },
+  "class_weights": {
+    "io": 1.0,
+    "nio": 1.0
+  },
+  "use_class_weights": true,
+  "use_weighted_sampler": false
+}
